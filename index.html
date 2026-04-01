@@ -1,429 +1,1237 @@
-
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pulse Analytics — Social + SEO Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <style>
-*{box-sizing:border-box;margin:0;padding:0}
-.app{display:flex;height:100vh;min-height:700px;font-family:var(--font-sans)}
-.sidebar{width:210px;flex-shrink:0;background:var(--color-background-primary);border-right:0.5px solid var(--color-border-tertiary);display:flex;flex-direction:column;overflow-y:auto}
-.logo{padding:16px 18px;display:flex;align-items:center;gap:9px;border-bottom:0.5px solid var(--color-border-tertiary)}
-.logo-mark{width:28px;height:28px;border-radius:7px;background:#185FA5;display:flex;align-items:center;justify-content:center}
-.logo-mark svg{width:15px;height:15px;fill:white}
-.logo-text{font-size:14px;font-weight:500;color:var(--color-text-primary)}
-.logo-text span{font-size:10px;font-weight:400;color:var(--color-text-tertiary);display:block;margin-top:1px}
-.nav-section{padding:14px 10px 4px;font-size:10px;color:var(--color-text-tertiary);letter-spacing:.06em;text-transform:uppercase}
-.nav-item{display:flex;align-items:center;gap:9px;padding:8px 10px;margin:1px 6px;border-radius:var(--border-radius-md);font-size:13px;color:var(--color-text-secondary);cursor:pointer;transition:background .12s}
-.nav-item:hover{background:var(--color-background-secondary)}
-.nav-item.active{background:var(--color-background-info);color:var(--color-text-info);font-weight:500}
-.nav-item svg{width:15px;height:15px;flex-shrink:0}
-.nav-dot{width:6px;height:6px;border-radius:50%;margin-left:auto;flex-shrink:0}
-.nav-footer{margin-top:auto;padding:12px 10px;border-top:0.5px solid var(--color-border-tertiary)}
-.plan-badge{background:var(--color-background-warning);color:var(--color-text-warning);font-size:11px;font-weight:500;padding:3px 8px;border-radius:20px;display:inline-block;margin-bottom:8px}
-.upgrade-btn{width:100%;padding:8px;font-size:12px;font-weight:500;background:#185FA5;color:white;border:none;border-radius:var(--border-radius-md);cursor:pointer}
-.main{flex:1;overflow-y:auto;background:var(--color-background-tertiary)}
-.topbar{background:var(--color-background-primary);border-bottom:0.5px solid var(--color-border-tertiary);padding:12px 22px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:10}
-.topbar-left h1{font-size:15px;font-weight:500;color:var(--color-text-primary)}
-.topbar-left p{font-size:12px;color:var(--color-text-tertiary);margin-top:1px}
-.topbar-right{display:flex;align-items:center;gap:8px}
-.drange{display:flex;gap:4px}
-.dr-btn{padding:5px 10px;font-size:12px;border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);background:transparent;color:var(--color-text-secondary);cursor:pointer}
-.dr-btn.active{background:var(--color-background-info);color:var(--color-text-info);border-color:transparent;font-weight:500}
-.content{padding:18px 22px}
-.kpi-row{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-bottom:16px}
-.kpi{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:14px}
-.kpi-label{font-size:11px;color:var(--color-text-tertiary);margin-bottom:5px}
-.kpi-val{font-size:22px;font-weight:500;color:var(--color-text-primary);line-height:1.1}
-.kpi-delta{font-size:11px;margin-top:4px}
-.up{color:#1D9E75}.down{color:#D85A30}
-.row2{display:grid;grid-template-columns:minmax(0,3fr) minmax(0,2fr);gap:10px;margin-bottom:16px}
-.card{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:16px}
-.card-hd{display:flex;align-items:start;justify-content:space-between;margin-bottom:14px}
-.card-title{font-size:13px;font-weight:500;color:var(--color-text-primary)}
-.card-sub{font-size:11px;color:var(--color-text-tertiary);margin-top:2px}
-.platform-chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px}
-.chip{display:flex;align-items:center;gap:5px;padding:5px 10px;border-radius:20px;font-size:12px;font-weight:500;cursor:pointer;border:1.5px solid transparent;transition:all .12s}
-.chip.on{border-color:currentColor}
-.chip.off{opacity:.4}
-.bar-row{display:flex;align-items:center;gap:8px;margin-bottom:8px}
-.bar-lbl{font-size:12px;color:var(--color-text-secondary);width:72px;text-align:right;flex-shrink:0}
-.bar-track{flex:1;height:7px;background:var(--color-background-secondary);border-radius:4px;overflow:hidden}
-.bar-fill{height:100%;border-radius:4px;transition:width .4s}
-.bar-val{font-size:12px;color:var(--color-text-tertiary);width:44px;text-align:right;flex-shrink:0}
-.ptable{width:100%;border-collapse:collapse}
-.ptable th{font-size:11px;color:var(--color-text-tertiary);font-weight:500;text-align:left;padding:5px 8px;border-bottom:0.5px solid var(--color-border-tertiary)}
-.ptable td{font-size:12px;padding:8px 8px;border-bottom:0.5px solid var(--color-border-tertiary);color:var(--color-text-primary);vertical-align:middle}
-.ptable tr:last-child td{border-bottom:none}
-.pill{display:inline-flex;align-items:center;font-size:11px;padding:2px 7px;border-radius:20px;font-weight:500}
-.ai-card{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:16px;margin-bottom:16px}
-.ai-header{display:flex;align-items:center;gap:8px;margin-bottom:12px}
-.ai-icon{width:28px;height:28px;border-radius:8px;background:#E6F1FB;display:flex;align-items:center;justify-content:center}
-.ai-icon svg{width:15px;height:15px;fill:#185FA5}
-.ai-title{font-size:13px;font-weight:500;color:var(--color-text-primary)}
-.ai-sub{font-size:11px;color:var(--color-text-tertiary)}
-.insight-row{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
-.insight{background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:12px}
-.insight-badge{font-size:10px;font-weight:500;padding:2px 7px;border-radius:20px;display:inline-block;margin-bottom:6px}
-.insight-text{font-size:12px;color:var(--color-text-secondary);line-height:1.5}
-.insight-action{font-size:11px;font-weight:500;margin-top:6px;color:var(--color-text-info);cursor:pointer}
-.seo-row{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-bottom:12px}
-.seo-stat{background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:11px}
-.seo-stat-label{font-size:11px;color:var(--color-text-tertiary);margin-bottom:3px}
-.seo-stat-val{font-size:18px;font-weight:500;color:var(--color-text-primary)}
-.mediakit-wrap{max-width:680px;margin:0 auto}
-.mk-header{background:#185FA5;border-radius:var(--border-radius-lg);padding:28px;margin-bottom:12px;color:white;display:flex;align-items:center;gap:18px}
-.mk-avatar{width:64px;height:64px;border-radius:50%;background:#378ADD;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:500;color:white;flex-shrink:0}
-.mk-name{font-size:20px;font-weight:500;color:white}
-.mk-handle{font-size:13px;color:#85B7EB;margin-top:2px}
-.mk-bio{font-size:13px;color:#B5D4F4;margin-top:6px;line-height:1.5}
-.mk-stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-bottom:12px}
-.mk-stat{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:14px;text-align:center}
-.mk-stat-val{font-size:20px;font-weight:500;color:var(--color-text-primary)}
-.mk-stat-label{font-size:11px;color:var(--color-text-tertiary);margin-top:3px}
-.mk-stat-plat{font-size:10px;color:var(--color-text-tertiary);margin-top:2px}
-.mk-platforms{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-bottom:12px}
-.mk-plat{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:14px;display:flex;align-items:center;gap:12px}
-.mk-plat-ico{width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
-.mk-plat-name{font-size:13px;font-weight:500;color:var(--color-text-primary)}
-.mk-plat-detail{font-size:12px;color:var(--color-text-secondary);margin-top:2px}
-.mk-plat-stats{margin-left:auto;text-align:right;flex-shrink:0}
-.mk-plat-stat-val{font-size:14px;font-weight:500;color:var(--color-text-primary)}
-.mk-plat-stat-label{font-size:10px;color:var(--color-text-tertiary)}
-.mk-footer{background:var(--color-background-secondary);border-radius:var(--border-radius-lg);padding:14px;display:flex;align-items:center;justify-content:space-between}
-.mk-footer-text{font-size:12px;color:var(--color-text-secondary)}
-.share-btn{padding:8px 16px;background:#185FA5;color:white;border:none;border-radius:var(--border-radius-md);font-size:12px;font-weight:500;cursor:pointer}
-.copy-btn{padding:8px 16px;background:transparent;color:var(--color-text-secondary);border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);font-size:12px;cursor:pointer}
-.pricing-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-bottom:16px}
-.price-card{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:20px}
-.price-card.popular{border:2px solid #185FA5}
-.popular-badge{background:#E6F1FB;color:#0C447C;font-size:11px;font-weight:500;padding:3px 10px;border-radius:20px;display:inline-block;margin-bottom:10px}
-.price-name{font-size:14px;font-weight:500;color:var(--color-text-primary);margin-bottom:4px}
-.price-amount{font-size:28px;font-weight:500;color:var(--color-text-primary);line-height:1}
-.price-period{font-size:12px;color:var(--color-text-tertiary)}
-.price-usd{font-size:11px;color:var(--color-text-tertiary);margin-top:2px}
-.price-divider{border:none;border-top:0.5px solid var(--color-border-tertiary);margin:14px 0}
-.price-feature{display:flex;align-items:center;gap:7px;font-size:12px;color:var(--color-text-secondary);margin-bottom:7px}
-.price-feature svg{width:13px;height:13px;flex-shrink:0}
-.price-btn{width:100%;padding:9px;font-size:13px;font-weight:500;border-radius:var(--border-radius-md);cursor:pointer;margin-top:14px;border:0.5px solid var(--color-border-secondary);background:transparent;color:var(--color-text-primary)}
-.price-btn.primary{background:#185FA5;color:white;border-color:transparent}
+:root {
+  --bg: #0a0b0e;
+  --bg2: #111318;
+  --bg3: #181c24;
+  --bg4: #1e2330;
+  --border: rgba(255,255,255,0.07);
+  --border2: rgba(255,255,255,0.12);
+  --text: #f0f2f7;
+  --text2: #8b92a5;
+  --text3: #4e5566;
+  --accent: #4f8ef7;
+  --accent2: #2563eb;
+  --accent-soft: rgba(79,142,247,0.12);
+  --green: #22c55e;
+  --green-soft: rgba(34,197,94,0.12);
+  --red: #f43f5e;
+  --red-soft: rgba(244,63,94,0.1);
+  --amber: #f59e0b;
+  --amber-soft: rgba(245,158,11,0.12);
+  --purple: #a855f7;
+  --purple-soft: rgba(168,85,247,0.12);
+  --radius: 10px;
+  --radius-lg: 14px;
+  --radius-xl: 20px;
+  --font: 'DM Sans', sans-serif;
+  --mono: 'DM Mono', monospace;
+  --sidebar-w: 220px;
+  --trans: all 0.18s ease;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; overflow: hidden; }
+body { font-family: var(--font); background: var(--bg); color: var(--text); font-size: 14px; }
+
+/* ─── SCREENS ─── */
+.screen { display: none; width: 100%; height: 100vh; overflow-y: auto; }
+.screen.active { display: flex; }
+
+/* ─── AUTH SCREEN ─── */
+#screen-auth {
+  background: var(--bg);
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+.auth-bg-grid {
+  position: absolute; inset: 0; overflow: hidden; pointer-events: none;
+  background-image: linear-gradient(var(--border) 1px, transparent 1px),
+    linear-gradient(90deg, var(--border) 1px, transparent 1px);
+  background-size: 48px 48px;
+  mask-image: radial-gradient(ellipse 60% 60% at 50% 50%, black 40%, transparent 100%);
+}
+.auth-wrap {
+  position: relative; z-index: 2;
+  width: 100%; max-width: 420px; padding: 24px;
+}
+.auth-logo {
+  display: flex; align-items: center; gap: 10px;
+  margin-bottom: 40px; justify-content: center;
+}
+.auth-logo-mark {
+  width: 36px; height: 36px; border-radius: 10px;
+  background: var(--accent); display: flex; align-items: center; justify-content: center;
+}
+.auth-logo-mark svg { width: 18px; height: 18px; fill: white; }
+.auth-logo-text { font-size: 18px; font-weight: 600; color: var(--text); }
+.auth-logo-text span { color: var(--text2); font-weight: 400; font-size: 13px; margin-left: 2px; }
+.auth-card {
+  background: var(--bg2);
+  border: 1px solid var(--border2);
+  border-radius: var(--radius-xl);
+  padding: 32px;
+}
+.auth-tabs { display: flex; gap: 4px; background: var(--bg3); border-radius: var(--radius); padding: 4px; margin-bottom: 28px; }
+.auth-tab {
+  flex: 1; padding: 8px; text-align: center; font-size: 13px; font-weight: 500;
+  color: var(--text2); cursor: pointer; border-radius: 7px; transition: var(--trans);
+}
+.auth-tab.active { background: var(--bg4); color: var(--text); }
+.auth-form { display: flex; flex-direction: column; gap: 14px; }
+.auth-form.hidden { display: none; }
+.form-label { font-size: 12px; color: var(--text2); margin-bottom: 5px; }
+.form-input {
+  width: 100%; padding: 11px 14px; background: var(--bg3);
+  border: 1px solid var(--border2); border-radius: var(--radius);
+  color: var(--text); font-family: var(--font); font-size: 13px;
+  outline: none; transition: var(--trans);
+}
+.form-input:focus { border-color: var(--accent); background: var(--bg4); }
+.form-input::placeholder { color: var(--text3); }
+.btn-primary {
+  padding: 12px 20px; background: var(--accent); color: white;
+  border: none; border-radius: var(--radius); font-family: var(--font);
+  font-size: 14px; font-weight: 500; cursor: pointer; transition: var(--trans);
+  width: 100%;
+}
+.btn-primary:hover { background: var(--accent2); }
+.auth-divider { display: flex; align-items: center; gap: 10px; margin: 4px 0; }
+.auth-divider hr { flex: 1; border: none; border-top: 1px solid var(--border); }
+.auth-divider span { font-size: 11px; color: var(--text3); }
+.btn-google {
+  width: 100%; padding: 11px; background: var(--bg3);
+  border: 1px solid var(--border2); border-radius: var(--radius);
+  color: var(--text); font-family: var(--font); font-size: 13px;
+  font-weight: 500; cursor: pointer; transition: var(--trans);
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+}
+.btn-google:hover { background: var(--bg4); border-color: var(--border2); }
+.auth-hint { font-size: 12px; color: var(--text3); text-align: center; margin-top: 6px; }
+.auth-hint a { color: var(--accent); cursor: pointer; }
+
+/* ─── ONBOARDING ─── */
+#screen-onboard {
+  flex-direction: column;
+  background: var(--bg);
+}
+.onboard-topbar {
+  padding: 18px 32px; display: flex; align-items: center;
+  justify-content: space-between; border-bottom: 1px solid var(--border);
+  background: var(--bg2); flex-shrink: 0;
+}
+.onboard-logo { display: flex; align-items: center; gap: 9px; }
+.onboard-logo-mark { width: 30px; height: 30px; border-radius: 8px; background: var(--accent); display: flex; align-items: center; justify-content: center; }
+.onboard-logo-mark svg { width: 15px; height: 15px; fill: white; }
+.onboard-logo-text { font-size: 15px; font-weight: 600; }
+.step-dots { display: flex; gap: 6px; }
+.step-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--bg4); transition: var(--trans); }
+.step-dot.done { background: var(--green); }
+.step-dot.active { background: var(--accent); width: 24px; border-radius: 4px; }
+.onboard-body { flex: 1; display: flex; align-items: center; justify-content: center; padding: 32px; }
+.onboard-card { width: 100%; max-width: 640px; }
+.onboard-step { display: none; }
+.onboard-step.active { display: block; }
+.step-tag { font-size: 11px; font-weight: 500; color: var(--accent); letter-spacing: .06em; text-transform: uppercase; margin-bottom: 10px; }
+.step-title { font-size: 26px; font-weight: 600; color: var(--text); margin-bottom: 8px; line-height: 1.2; }
+.step-sub { font-size: 14px; color: var(--text2); margin-bottom: 32px; line-height: 1.6; }
+.platform-connect-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 28px; }
+.plat-item {
+  background: var(--bg2); border: 1px solid var(--border);
+  border-radius: var(--radius-lg); padding: 16px;
+  display: flex; align-items: center; gap: 12px;
+  cursor: pointer; transition: var(--trans);
+}
+.plat-item:hover { border-color: var(--border2); background: var(--bg3); }
+.plat-item.connected { border-color: rgba(34,197,94,0.4); background: rgba(34,197,94,0.04); }
+.plat-icon { width: 38px; height: 38px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 17px; flex-shrink: 0; }
+.plat-name { font-size: 13px; font-weight: 500; color: var(--text); }
+.plat-desc { font-size: 11px; color: var(--text2); margin-top: 2px; }
+.plat-status { margin-left: auto; flex-shrink: 0; }
+.status-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--border2); }
+.status-dot.on { background: var(--green); box-shadow: 0 0 6px rgba(34,197,94,0.5); }
+.connect-btn-sm {
+  font-size: 11px; padding: 4px 10px; border-radius: 6px;
+  border: 1px solid var(--border2); background: transparent;
+  color: var(--text2); cursor: pointer; transition: var(--trans);
+  font-family: var(--font);
+}
+.connect-btn-sm:hover { background: var(--accent-soft); color: var(--accent); border-color: var(--accent); }
+.connect-btn-sm.done { background: var(--green-soft); color: var(--green); border-color: rgba(34,197,94,0.3); }
+.website-input-row { display: flex; gap: 10px; margin-bottom: 14px; }
+.website-input-row .form-input { flex: 1; }
+.btn-connect { padding: 11px 18px; background: var(--accent); color: white; border: none; border-radius: var(--radius); font-family: var(--font); font-size: 13px; font-weight: 500; cursor: pointer; white-space: nowrap; }
+.onboard-nav { display: flex; align-items: center; justify-content: space-between; }
+.btn-back { padding: 10px 18px; background: transparent; border: 1px solid var(--border2); color: var(--text2); border-radius: var(--radius); font-family: var(--font); font-size: 13px; cursor: pointer; transition: var(--trans); }
+.btn-back:hover { background: var(--bg3); }
+.btn-next { padding: 11px 24px; background: var(--accent); color: white; border: none; border-radius: var(--radius); font-family: var(--font); font-size: 14px; font-weight: 500; cursor: pointer; transition: var(--trans); display: flex; align-items: center; gap: 7px; }
+.btn-next:hover { background: var(--accent2); }
+.connected-count { font-size: 13px; color: var(--text2); }
+.connected-count span { color: var(--green); font-weight: 500; }
+
+/* ─── MAIN APP ─── */
+#screen-app { flex-direction: row; overflow: hidden; }
+
+.sidebar {
+  width: var(--sidebar-w); flex-shrink: 0;
+  background: var(--bg2); border-right: 1px solid var(--border);
+  display: flex; flex-direction: column; height: 100vh; overflow-y: auto;
+}
+.sidebar-logo {
+  padding: 18px 16px 14px; display: flex; align-items: center; gap: 9px;
+  border-bottom: 1px solid var(--border);
+}
+.s-logo-mark { width: 28px; height: 28px; border-radius: 8px; background: var(--accent); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.s-logo-mark svg { width: 14px; height: 14px; fill: white; }
+.s-logo-name { font-size: 14px; font-weight: 600; color: var(--text); }
+.s-logo-name small { display: block; font-size: 10px; font-weight: 400; color: var(--text3); margin-top: 1px; }
+.s-section { padding: 16px 14px 5px; font-size: 10px; color: var(--text3); letter-spacing: .07em; text-transform: uppercase; font-weight: 500; }
+.s-item {
+  display: flex; align-items: center; gap: 9px;
+  padding: 8px 10px; margin: 1px 6px;
+  border-radius: var(--radius); font-size: 13px; color: var(--text2);
+  cursor: pointer; transition: var(--trans);
+}
+.s-item:hover { background: var(--bg3); color: var(--text); }
+.s-item.active { background: var(--accent-soft); color: var(--accent); }
+.s-item svg { width: 15px; height: 15px; flex-shrink: 0; }
+.s-badge { margin-left: auto; font-size: 10px; font-weight: 500; padding: 2px 6px; border-radius: 10px; }
+.s-dot { width: 6px; height: 6px; border-radius: 50%; margin-left: auto; }
+.s-footer { margin-top: auto; padding: 14px 12px; border-top: 1px solid var(--border); }
+.s-user { display: flex; align-items: center; gap: 9px; padding: 8px 6px; margin-bottom: 8px; }
+.s-avatar { width: 30px; height: 30px; border-radius: 50%; background: var(--accent); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; color: white; flex-shrink: 0; }
+.s-user-name { font-size: 13px; font-weight: 500; color: var(--text); }
+.s-user-plan { font-size: 11px; color: var(--text3); }
+.s-upgrade { width: 100%; padding: 9px; background: linear-gradient(135deg, var(--accent) 0%, var(--purple) 100%); color: white; border: none; border-radius: var(--radius); font-family: var(--font); font-size: 12px; font-weight: 500; cursor: pointer; }
+
+.main-area { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+
+.topbar {
+  background: var(--bg2); border-bottom: 1px solid var(--border);
+  padding: 12px 24px; display: flex; align-items: center;
+  justify-content: space-between; flex-shrink: 0;
+}
+.topbar-title { font-size: 15px; font-weight: 600; color: var(--text); }
+.topbar-sub { font-size: 11px; color: var(--text3); margin-top: 2px; }
+.topbar-right { display: flex; align-items: center; gap: 8px; }
+.range-pills { display: flex; gap: 3px; background: var(--bg3); padding: 3px; border-radius: 8px; }
+.rp { padding: 5px 10px; font-size: 11px; font-weight: 500; border-radius: 6px; cursor: pointer; color: var(--text2); transition: var(--trans); }
+.rp.active { background: var(--bg4); color: var(--text); }
+.topbar-btn { padding: 7px 14px; background: var(--bg3); border: 1px solid var(--border2); border-radius: var(--radius); color: var(--text2); font-family: var(--font); font-size: 12px; font-weight: 500; cursor: pointer; display: flex; align-items: center; gap: 6px; transition: var(--trans); }
+.topbar-btn:hover { background: var(--bg4); color: var(--text); }
+.topbar-btn.accent { background: var(--accent); color: white; border-color: transparent; }
+.topbar-btn.accent:hover { background: var(--accent2); }
+
+.page { flex: 1; overflow-y: auto; padding: 20px 24px; display: none; }
+.page.active { display: block; }
+
+/* ─── CARDS & GRIDS ─── */
+.kpi-grid { display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: 10px; margin-bottom: 16px; }
+.kpi-card { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 16px; }
+.kpi-label { font-size: 11px; color: var(--text3); margin-bottom: 6px; }
+.kpi-val { font-size: 24px; font-weight: 600; color: var(--text); line-height: 1; }
+.kpi-delta { font-size: 11px; margin-top: 5px; display: flex; align-items: center; gap: 4px; }
+.delta-up { color: var(--green); }
+.delta-down { color: var(--red); }
+.card { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 18px; }
+.card-hd { display: flex; align-items: start; justify-content: space-between; margin-bottom: 16px; }
+.card-title { font-size: 13px; font-weight: 600; color: var(--text); }
+.card-sub { font-size: 11px; color: var(--text3); margin-top: 2px; }
+.two-col { display: grid; grid-template-columns: minmax(0,3fr) minmax(0,2fr); gap: 12px; margin-bottom: 12px; }
+.three-col { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 12px; margin-bottom: 12px; }
+
+/* ─── TABLE ─── */
+.data-table { width: 100%; border-collapse: collapse; }
+.data-table th { font-size: 11px; color: var(--text3); font-weight: 500; text-align: left; padding: 6px 10px; border-bottom: 1px solid var(--border); }
+.data-table td { font-size: 12px; padding: 9px 10px; border-bottom: 1px solid var(--border); color: var(--text2); vertical-align: middle; }
+.data-table tr:last-child td { border-bottom: none; }
+.data-table tr:hover td { background: var(--bg3); }
+.pill { display: inline-flex; align-items: center; font-size: 10px; padding: 2px 8px; border-radius: 20px; font-weight: 500; }
+
+/* ─── PLATFORM CHIPS ─── */
+.plat-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 14px; }
+.plat-chip { display: flex; align-items: center; gap: 5px; padding: 5px 11px; border-radius: 20px; font-size: 12px; font-weight: 500; cursor: pointer; border: 1.5px solid transparent; transition: var(--trans); opacity: .45; }
+.plat-chip.active { opacity: 1; border-color: currentColor; }
+
+/* ─── BAR ─── */
+.hbar { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+.hbar-label { font-size: 12px; color: var(--text2); width: 80px; text-align: right; flex-shrink: 0; }
+.hbar-track { flex: 1; height: 6px; background: var(--bg4); border-radius: 3px; overflow: hidden; }
+.hbar-fill { height: 100%; border-radius: 3px; transition: width .5s cubic-bezier(.4,0,.2,1); }
+.hbar-val { font-size: 11px; color: var(--text3); width: 48px; text-align: right; flex-shrink: 0; font-family: var(--mono); }
+
+/* ─── AI INSIGHT CARDS ─── */
+.insight-grid { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 10px; }
+.insight-card { background: var(--bg3); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 14px; }
+.i-tag { font-size: 10px; font-weight: 600; letter-spacing: .05em; text-transform: uppercase; padding: 2px 7px; border-radius: 10px; display: inline-block; margin-bottom: 8px; }
+.i-text { font-size: 12px; color: var(--text2); line-height: 1.6; }
+.i-text strong { color: var(--text); font-weight: 600; }
+.i-action { font-size: 11px; color: var(--accent); margin-top: 8px; cursor: pointer; display: flex; align-items: center; gap: 4px; }
+
+/* ─── HEATMAP ─── */
+.hmap-cell { width: 34px; height: 28px; border-radius: 5px; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 500; transition: var(--trans); cursor: default; }
+
+/* ─── REPORT BUILDER ─── */
+.report-sidebar { width: 260px; flex-shrink: 0; background: var(--bg2); border-right: 1px solid var(--border); overflow-y: auto; }
+.report-canvas { flex: 1; overflow-y: auto; background: var(--bg); padding: 24px; }
+.report-page-active { display: flex !important; padding: 0; }
+.report-section-header { font-size: 11px; font-weight: 600; color: var(--text3); text-transform: uppercase; letter-spacing: .06em; padding: 14px 16px 6px; }
+.report-block-btn {
+  display: flex; align-items: center; gap: 9px;
+  padding: 10px 14px; cursor: pointer; color: var(--text2);
+  font-size: 13px; transition: var(--trans); border-radius: 8px; margin: 2px 8px;
+}
+.report-block-btn:hover { background: var(--bg3); color: var(--text); }
+.report-block-btn svg { width: 15px; height: 15px; flex-shrink: 0; }
+.rb-desc { font-size: 11px; color: var(--text3); margin-top: 1px; }
+.report-canvas-inner { background: white; border-radius: var(--radius-lg); min-height: 900px; padding: 48px; max-width: 860px; margin: 0 auto; box-shadow: 0 0 0 1px rgba(0,0,0,0.1); }
+.rc-brand { display: flex; align-items: center; justify-content: space-between; margin-bottom: 36px; padding-bottom: 20px; border-bottom: 2px solid #0a0b0e; }
+.rc-title { font-size: 26px; font-weight: 700; color: #0a0b0e; font-family: 'DM Sans'; }
+.rc-meta { font-size: 12px; color: #666; margin-top: 4px; font-family: 'DM Sans'; }
+.rc-logo { font-size: 18px; font-weight: 700; color: #4f8ef7; font-family: 'DM Sans'; }
+.rc-section { margin-bottom: 32px; }
+.rc-section-title { font-size: 13px; font-weight: 700; color: #0a0b0e; text-transform: uppercase; letter-spacing: .07em; margin-bottom: 14px; padding-bottom: 6px; border-bottom: 1px solid #e5e7eb; font-family: 'DM Sans'; }
+.rc-kpi-row { display: grid; grid-template-columns: repeat(4,1fr); gap: 10px; margin-bottom: 20px; }
+.rc-kpi { background: #f8fafc; border: 1px solid #e5e7eb; border-radius: 8px; padding: 14px; }
+.rc-kpi-label { font-size: 10px; color: #666; text-transform: uppercase; letter-spacing: .04em; margin-bottom: 4px; font-family: 'DM Sans'; }
+.rc-kpi-val { font-size: 22px; font-weight: 700; color: #0a0b0e; font-family: 'DM Sans'; }
+.rc-kpi-delta { font-size: 11px; margin-top: 3px; font-family: 'DM Sans'; }
+.rc-chart-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 20px; }
+.rc-chart-box { border: 1px solid #e5e7eb; border-radius: 8px; padding: 14px; }
+.rc-chart-title { font-size: 11px; font-weight: 700; color: #0a0b0e; text-transform: uppercase; letter-spacing: .04em; margin-bottom: 10px; font-family: 'DM Sans'; }
+.rc-table { width: 100%; border-collapse: collapse; font-family: 'DM Sans'; }
+.rc-table th { font-size: 10px; font-weight: 700; color: #666; text-transform: uppercase; letter-spacing: .04em; padding: 8px 10px; border-bottom: 2px solid #e5e7eb; text-align: left; }
+.rc-table td { font-size: 12px; padding: 9px 10px; border-bottom: 1px solid #f1f5f9; color: #1a1a2e; }
+.rc-table tr:last-child td { border-bottom: none; }
+.rc-plat-row { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; margin-bottom: 14px; }
+.rc-plat-card { border: 1px solid #e5e7eb; border-radius: 8px; padding: 12px; }
+.rc-plat-name { font-size: 12px; font-weight: 700; color: #0a0b0e; margin-bottom: 2px; font-family: 'DM Sans'; display: flex; align-items: center; gap: 6px; }
+.rc-plat-stat { font-size: 18px; font-weight: 700; color: #0a0b0e; margin: 6px 0 2px; font-family: 'DM Sans'; }
+.rc-plat-label { font-size: 10px; color: #666; font-family: 'DM Sans'; }
+.rc-insight-box { background: #f0f7ff; border: 1px solid #bfdbfe; border-radius: 8px; padding: 14px; margin-bottom: 10px; }
+.rc-insight-title { font-size: 11px; font-weight: 700; color: #1e40af; text-transform: uppercase; letter-spacing: .04em; margin-bottom: 4px; font-family: 'DM Sans'; }
+.rc-insight-text { font-size: 12px; color: #1e3a5f; line-height: 1.6; font-family: 'DM Sans'; }
+.rc-footer { margin-top: 40px; padding-top: 16px; border-top: 1px solid #e5e7eb; display: flex; justify-content: space-between; align-items: center; }
+.rc-footer-text { font-size: 10px; color: #999; font-family: 'DM Sans'; }
+.report-toolbar { background: var(--bg2); border-bottom: 1px solid var(--border); padding: 10px 20px; display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+.rt-btn { padding: 7px 14px; border-radius: var(--radius); border: 1px solid var(--border2); background: transparent; color: var(--text2); font-family: var(--font); font-size: 12px; font-weight: 500; cursor: pointer; display: flex; align-items: center; gap: 6px; transition: var(--trans); }
+.rt-btn:hover { background: var(--bg3); color: var(--text); }
+.rt-btn.accent { background: var(--accent); color: white; border-color: transparent; }
+.rt-btn.accent:hover { background: var(--accent2); }
+.report-type-tabs { display: flex; gap: 4px; }
+.rtt { padding: 6px 12px; border-radius: 7px; font-size: 12px; font-weight: 500; cursor: pointer; color: var(--text2); transition: var(--trans); }
+.rtt.active { background: var(--accent-soft); color: var(--accent); }
+
+/* ─── SEO PAGE ─── */
+.seo-combined-note { background: var(--accent-soft); border: 1px solid rgba(79,142,247,0.25); border-radius: var(--radius); padding: 10px 14px; font-size: 12px; color: var(--accent); margin-bottom: 14px; display: flex; align-items: center; gap: 8px; }
+
+/* ─── MEDIA KIT ─── */
+.mk-preview { background: var(--bg3); border-radius: var(--radius-lg); padding: 0; overflow: hidden; border: 1px solid var(--border2); }
+.mk-header-band { background: linear-gradient(135deg, #0f1a2e 0%, #1a2744 100%); padding: 28px; display: flex; align-items: center; gap: 18px; border-bottom: 1px solid rgba(255,255,255,0.08); }
+.mk-avatar { width: 60px; height: 60px; border-radius: 50%; background: var(--accent); display: flex; align-items: center; justify-content: center; font-size: 22px; font-weight: 700; color: white; flex-shrink: 0; border: 2px solid rgba(255,255,255,0.2); }
+.mk-name { font-size: 18px; font-weight: 700; color: white; }
+.mk-handle { font-size: 12px; color: #6b8ab5; margin-top: 2px; }
+.mk-bio { font-size: 12px; color: #8da4c4; margin-top: 6px; line-height: 1.5; }
+.mk-verify { display: inline-flex; align-items: center; gap: 5px; font-size: 10px; color: var(--green); background: var(--green-soft); padding: 3px 8px; border-radius: 10px; margin-top: 8px; }
+.mk-body { padding: 20px; }
+.mk-stat-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 8px; margin-bottom: 14px; }
+.mk-stat-card { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); padding: 12px; text-align: center; }
+.mk-stat-val { font-size: 18px; font-weight: 700; color: var(--text); }
+.mk-stat-label { font-size: 10px; color: var(--text3); margin-top: 3px; }
+.mk-plat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 14px; }
+.mk-plat-row { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); padding: 12px; display: flex; align-items: center; gap: 10px; }
+.mk-plat-ico { width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 14px; flex-shrink: 0; }
+.mk-plat-info { flex: 1; }
+.mk-plat-pname { font-size: 12px; font-weight: 600; color: var(--text); }
+.mk-plat-detail { font-size: 11px; color: var(--text3); margin-top: 1px; }
+.mk-plat-eng { font-size: 13px; font-weight: 600; color: var(--green); }
+.mk-plat-eng-label { font-size: 10px; color: var(--text3); }
+.mk-footer-band { background: var(--bg3); border-top: 1px solid var(--border); padding: 14px 20px; display: flex; align-items: center; justify-content: space-between; }
+.share-link-box { display: flex; align-items: center; gap: 8px; background: var(--bg2); border: 1px solid var(--border2); border-radius: var(--radius); padding: 8px 12px; }
+.share-link-text { font-size: 12px; color: var(--text2); font-family: var(--mono); }
+.btn-copy { padding: 6px 12px; background: var(--accent); color: white; border: none; border-radius: 7px; font-size: 11px; font-weight: 600; cursor: pointer; font-family: var(--font); }
+
+/* ─── SETTINGS ─── */
+.settings-section { margin-bottom: 28px; }
+.settings-title { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 14px; }
+.settings-row { display: flex; align-items: center; justify-content: space-between; padding: 14px 16px; background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); margin-bottom: 6px; }
+.settings-row-label { font-size: 13px; color: var(--text); }
+.settings-row-sub { font-size: 11px; color: var(--text3); margin-top: 2px; }
+.toggle { width: 38px; height: 22px; background: var(--bg4); border-radius: 11px; cursor: pointer; position: relative; transition: var(--trans); flex-shrink: 0; }
+.toggle.on { background: var(--accent); }
+.toggle::after { content: ''; position: absolute; top: 3px; left: 3px; width: 16px; height: 16px; background: white; border-radius: 50%; transition: var(--trans); }
+.toggle.on::after { left: 19px; }
+.conn-row { display: flex; align-items: center; justify-content: space-between; padding: 14px 16px; background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); margin-bottom: 6px; }
+.conn-plat { display: flex; align-items: center; gap: 10px; }
+.conn-ico { width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 14px; }
+.conn-name { font-size: 13px; font-weight: 500; color: var(--text); }
+.conn-status { font-size: 11px; margin-top: 1px; }
+.conn-actions { display: flex; gap: 6px; }
+.btn-reconnect { padding: 6px 12px; background: transparent; border: 1px solid var(--border2); color: var(--text2); font-size: 11px; border-radius: 7px; cursor: pointer; font-family: var(--font); transition: var(--trans); }
+.btn-reconnect:hover { background: var(--bg3); }
+.btn-disconnect { padding: 6px 12px; background: var(--red-soft); border: 1px solid rgba(244,63,94,0.2); color: var(--red); font-size: 11px; border-radius: 7px; cursor: pointer; font-family: var(--font); }
 </style>
+</head>
+<body>
 
-<div class="app">
-<div class="sidebar">
-  <div class="logo">
-    <div class="logo-mark"><svg viewBox="0 0 16 16"><path d="M2 3h12v2H2zm0 4h8v2H2zm0 4h10v2H2z"/></svg></div>
-    <div class="logo-text">Pulse <span>Social + SEO analytics</span></div>
-  </div>
-  <div class="nav-section">Overview</div>
-  <div class="nav-item active" id="nav-overview" onclick="nav('overview',this)">
-    <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
-    Dashboard
-  </div>
-  <div class="nav-item" id="nav-ai" onclick="nav('ai',this)">
-    <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M12 2a7 7 0 0 1 7 7c0 3-1.8 5.5-4.5 6.6V17h-5v-1.4C6.8 14.5 5 12 5 9a7 7 0 0 1 7-7z"/><path d="M9 21h6"/><path d="M10 17v4m4-4v4"/></svg>
-    AI insights
-    <span style="margin-left:auto;background:#E6F1FB;color:#185FA5;font-size:10px;padding:1px 6px;border-radius:10px;font-weight:500">3 new</span>
-  </div>
-  <div class="nav-item" id="nav-seo" onclick="nav('seo',this)">
-    <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-    SEO analytics
-  </div>
-  <div class="nav-item" id="nav-mediakit" onclick="nav('mediakit',this)">
-    <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
-    Sponsor media kit
-    <span style="margin-left:auto;background:#EAF3DE;color:#3B6D11;font-size:10px;padding:1px 6px;border-radius:10px;font-weight:500">New</span>
-  </div>
-  <div class="nav-section">Platforms</div>
-  <div class="nav-item" onclick="nav('overview',document.getElementById('nav-overview'))">
-    <span style="font-size:13px">📷</span> Instagram <div class="nav-dot" style="background:#1D9E75"></div>
-  </div>
-  <div class="nav-item" onclick="nav('overview',document.getElementById('nav-overview'))">
-    <span style="font-size:13px">▶</span> YouTube <div class="nav-dot" style="background:#1D9E75"></div>
-  </div>
-  <div class="nav-item" onclick="nav('overview',document.getElementById('nav-overview'))">
-    <span style="font-size:13px">in</span> LinkedIn <div class="nav-dot" style="background:#1D9E75"></div>
-  </div>
-  <div class="nav-item" onclick="nav('overview',document.getElementById('nav-overview'))">
-    <span style="font-size:13px">♪</span> TikTok <div class="nav-dot" style="background:#1D9E75"></div>
-  </div>
-  <div class="nav-item" onclick="nav('overview',document.getElementById('nav-overview'))">
-    <span style="font-size:13px">P</span> Pinterest <div class="nav-dot" style="background:#1D9E75"></div>
-  </div>
-  <div class="nav-item" onclick="nav('pricing',document.getElementById('nav-pricing') || this)" id="nav-pricing">
-    <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 1 0 0 7h5a3.5 3.5 0 1 1 0 7H6"/></svg>
-    Pricing
-  </div>
-  <div class="nav-footer">
-    <div class="plan-badge">Free plan</div>
-    <div style="font-size:12px;color:var(--color-text-secondary);margin-bottom:10px">3 of 5 platforms used</div>
-    <button class="upgrade-btn" onclick="nav('pricing',this)">Upgrade to Pro ₹499/mo</button>
-  </div>
-</div>
-
-<div class="main">
-  <div class="topbar">
-    <div class="topbar-left">
-      <h1 id="page-title">All platforms overview</h1>
-      <p id="page-sub">Last 30 days · 5 platforms connected</p>
+<!-- ═══════════════════════════════════ AUTH ═══════════════════════════════════ -->
+<div id="screen-auth" class="screen active">
+  <div class="auth-bg-grid"></div>
+  <div class="auth-wrap">
+    <div class="auth-logo">
+      <div class="auth-logo-mark"><svg viewBox="0 0 16 16"><path d="M2 3h12v2H2zm0 4h8v2H2zm0 4h10v2H2z"/></svg></div>
+      <div class="auth-logo-text">Pulse <span>Analytics</span></div>
     </div>
-    <div class="topbar-right">
-      <div class="drange">
-        <button class="dr-btn" onclick="setRange(this)">7d</button>
-        <button class="dr-btn active" onclick="setRange(this)">30d</button>
-        <button class="dr-btn" onclick="setRange(this)">90d</button>
+    <div class="auth-card">
+      <div class="auth-tabs">
+        <div class="auth-tab active" onclick="authTab('login')">Sign in</div>
+        <div class="auth-tab" onclick="authTab('signup')">Create account</div>
+      </div>
+      <div id="form-login" class="auth-form">
+        <div>
+          <div class="form-label">Email address</div>
+          <input class="form-input" type="email" placeholder="you@example.com">
+        </div>
+        <div>
+          <div class="form-label">Password</div>
+          <input class="form-input" type="password" placeholder="••••••••">
+        </div>
+        <button class="btn-primary" onclick="goTo('onboard')">Sign in to Pulse</button>
+        <div class="auth-divider"><hr><span>or</span><hr></div>
+        <button class="btn-google" onclick="goTo('onboard')">
+          <svg width="16" height="16" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+          Continue with Google
+        </button>
+        <p class="auth-hint">Don't have an account? <a onclick="authTab('signup')">Sign up free</a></p>
+      </div>
+      <div id="form-signup" class="auth-form hidden">
+        <div>
+          <div class="form-label">Full name</div>
+          <input class="form-input" type="text" placeholder="Rahul Sharma">
+        </div>
+        <div>
+          <div class="form-label">Email address</div>
+          <input class="form-input" type="email" placeholder="you@example.com">
+        </div>
+        <div>
+          <div class="form-label">Password</div>
+          <input class="form-input" type="password" placeholder="Min 8 characters">
+        </div>
+        <button class="btn-primary" onclick="goTo('onboard')">Create free account</button>
+        <div class="auth-divider"><hr><span>or</span><hr></div>
+        <button class="btn-google" onclick="goTo('onboard')">
+          <svg width="16" height="16" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+          Continue with Google
+        </button>
+        <p class="auth-hint">Already have an account? <a onclick="authTab('login')">Sign in</a></p>
       </div>
     </div>
   </div>
-
-  <div class="content" id="page-content"></div>
-</div>
 </div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<!-- ═══════════════════════════════════ ONBOARDING ═══════════════════════════════════ -->
+<div id="screen-onboard" class="screen">
+  <div class="onboard-topbar">
+    <div class="onboard-logo">
+      <div class="onboard-logo-mark"><svg viewBox="0 0 16 16"><path d="M2 3h12v2H2zm0 4h8v2H2zm0 4h10v2H2z"/></svg></div>
+      <div class="onboard-logo-text">Pulse Analytics</div>
+    </div>
+    <div class="step-dots">
+      <div class="step-dot active" id="sd0"></div>
+      <div class="step-dot" id="sd1"></div>
+      <div class="step-dot" id="sd2"></div>
+      <div class="step-dot" id="sd3"></div>
+    </div>
+  </div>
+  <div class="onboard-body">
+    <div class="onboard-card">
+
+      <!-- Step 1: Welcome -->
+      <div class="onboard-step active" id="step-0">
+        <div class="step-tag">Welcome to Pulse</div>
+        <div class="step-title">Let's set up your analytics hub</div>
+        <div class="step-sub">Connect your social media accounts and website in under 2 minutes. We'll pull in your real data and start showing insights right away.</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:28px">
+          <div style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-lg);padding:16px;text-align:center">
+            <div style="font-size:24px;margin-bottom:8px">📊</div>
+            <div style="font-size:13px;font-weight:500;color:var(--text);margin-bottom:4px">All in one place</div>
+            <div style="font-size:12px;color:var(--text2)">Every platform, one dashboard</div>
+          </div>
+          <div style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-lg);padding:16px;text-align:center">
+            <div style="font-size:24px;margin-bottom:8px">🤖</div>
+            <div style="font-size:13px;font-weight:500;color:var(--text);margin-bottom:4px">AI insights</div>
+            <div style="font-size:12px;color:var(--text2)">Get told what to do next</div>
+          </div>
+          <div style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-lg);padding:16px;text-align:center">
+            <div style="font-size:24px;margin-bottom:8px">📄</div>
+            <div style="font-size:13px;font-weight:500;color:var(--text);margin-bottom:4px">Export reports</div>
+            <div style="font-size:12px;color:var(--text2)">Like Power BI, for creators</div>
+          </div>
+        </div>
+        <div class="onboard-nav">
+          <div></div>
+          <button class="btn-next" onclick="nextStep()">Get started <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg></button>
+        </div>
+      </div>
+
+      <!-- Step 2: Connect social -->
+      <div class="onboard-step" id="step-1">
+        <div class="step-tag">Step 1 of 3</div>
+        <div class="step-title">Connect your social accounts</div>
+        <div class="step-sub">We use official OAuth — read-only access, we never post on your behalf.</div>
+        <div class="platform-connect-grid" id="platform-grid">
+          ${[
+            ['📷','Instagram','Business/Creator accounts','#3b1f2b',true],
+            ['▶','YouTube','Channel analytics & stats','#2d1515',true],
+            ['♪','TikTok','Video reach & engagement','#1f1430',true],
+            ['in','LinkedIn','Page & post analytics','#102030',false],
+            ['P','Pinterest','Pin & board performance','#2d1010',false],
+            ['✕','X (Twitter)','Tweets & audience data','#1a1a1a',false],
+            ['◉','Website SEO','Connect in next step','#0f1a20',false],
+          ].map(([ico,name,desc,bg,on],i)=>`
+          <div class="plat-item ${on?'connected':''}" id="pi-${i}" onclick="togglePlat(${i})">
+            <div class="plat-icon" style="background:${bg}">${ico}</div>
+            <div><div class="plat-name">${name}</div><div class="plat-desc">${desc}</div></div>
+            <div class="plat-status">
+              <button class="connect-btn-sm ${on?'done':''}" id="pb-${i}">${on?'Connected':'Connect'}</button>
+            </div>
+          </div>`).join('')}
+        </div>
+        <div class="onboard-nav">
+          <button class="btn-back" onclick="prevStep()">Back</button>
+          <div style="display:flex;align-items:center;gap:14px">
+            <div class="connected-count">Connected: <span id="conn-count">3</span> / 6</div>
+            <button class="btn-next" onclick="nextStep()">Continue <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg></button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 3: Website -->
+      <div class="onboard-step" id="step-2">
+        <div class="step-tag">Step 2 of 3</div>
+        <div class="step-title">Add your website for SEO data</div>
+        <div class="step-sub">We connect to Google Search Console to pull your organic traffic, keyword rankings, and backlink data — all inside Pulse.</div>
+        <div style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-lg);padding:20px;margin-bottom:20px">
+          <div style="font-size:13px;font-weight:500;color:var(--text);margin-bottom:12px">Your website URL</div>
+          <div class="website-input-row">
+            <input class="form-input" id="website-url" type="text" placeholder="https://yourwebsite.com" value="https://rahulsharma.in">
+            <button class="btn-connect" onclick="verifyWebsite()">Verify</button>
+          </div>
+          <div id="website-status" style="font-size:12px;color:var(--green);display:none">
+            ✓ Domain verified — connecting to Google Search Console
+          </div>
+          <div style="margin-top:16px;padding-top:16px;border-top:1px solid var(--border)">
+            <div style="font-size:12px;color:var(--text2);margin-bottom:10px">Or connect directly:</div>
+            <button class="btn-google" onclick="verifyWebsite()" style="justify-content:start;gap:10px">
+              <svg width="16" height="16" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+              Connect Google Search Console
+            </button>
+          </div>
+        </div>
+        <div class="onboard-nav">
+          <button class="btn-back" onclick="prevStep()">Back</button>
+          <button class="btn-next" onclick="nextStep()">Continue <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg></button>
+        </div>
+      </div>
+
+      <!-- Step 4: Done -->
+      <div class="onboard-step" id="step-3">
+        <div style="text-align:center;padding:20px 0">
+          <div style="width:64px;height:64px;background:var(--green-soft);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 20px;font-size:28px">✓</div>
+          <div class="step-title" style="text-align:center">You're all set!</div>
+          <div class="step-sub" style="text-align:center">We're syncing your data now. Your dashboard will be ready in a few seconds.</div>
+          <div style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-lg);padding:20px;margin:20px 0;text-align:left">
+            <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:12px">Connected accounts</div>
+            ${[['📷','Instagram','@rahulsharma_','Connected','#3b1f2b'],['▶','YouTube','Rahul Sharma','Connected','#2d1515'],['♪','TikTok','@rahulsharma','Connected','#1f1430'],['◉','Website','rahulsharma.in','Verified','#0f1a20']].map(([ico,name,h,s,bg])=>`
+            <div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border)">
+              <div style="width:28px;height:28px;border-radius:7px;background:${bg};display:flex;align-items:center;justify-content:center;font-size:13px">${ico}</div>
+              <div style="flex:1"><div style="font-size:12px;font-weight:500;color:var(--text)">${name}</div><div style="font-size:11px;color:var(--text3)">${h}</div></div>
+              <div style="font-size:11px;color:var(--green)">${s}</div>
+            </div>`).join('')}
+          </div>
+          <button class="btn-next" style="width:100%;justify-content:center;margin-top:8px" onclick="goTo('app')">
+            Open my dashboard <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════ MAIN APP ═══════════════════════════════════ -->
+<div id="screen-app" class="screen">
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <div class="sidebar-logo">
+      <div class="s-logo-mark"><svg viewBox="0 0 16 16"><path d="M2 3h12v2H2zm0 4h8v2H2zm0 4h10v2H2z"/></svg></div>
+      <div><div class="s-logo-name">Pulse <small>Social + SEO analytics</small></div></div>
+    </div>
+    <div class="s-section">Overview</div>
+    <div class="s-item active" id="si-dashboard" onclick="appNav('dashboard',this)">
+      <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+      Dashboard
+    </div>
+    <div class="s-item" id="si-ai" onclick="appNav('ai',this)">
+      <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M12 2a7 7 0 0 1 7 7c0 3-1.8 5.5-4.5 6.6V17h-5v-1.4C6.8 14.5 5 12 5 9a7 7 0 0 1 7-7z"/><path d="M9 21h6"/></svg>
+      AI insights
+      <span class="s-badge" style="background:var(--accent-soft);color:var(--accent)">3</span>
+    </div>
+    <div class="s-item" id="si-seo" onclick="appNav('seo',this)">
+      <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      SEO analytics
+    </div>
+    <div class="s-item" id="si-reports" onclick="appNav('reports',this)">
+      <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="16" y2="17"/></svg>
+      Reports
+      <span class="s-badge" style="background:var(--purple-soft);color:var(--purple)">New</span>
+    </div>
+    <div class="s-item" id="si-mediakit" onclick="appNav('mediakit',this)">
+      <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M4 4h16v2H4zm0 6h10v2H4zm0 6h12v2H4z"/></svg>
+      Sponsor media kit
+    </div>
+    <div class="s-section">Platforms</div>
+    ${[['📷','Instagram','#1D9E75'],['▶','YouTube','#1D9E75'],['♪','TikTok','#1D9E75'],['in','LinkedIn','#f59e0b'],['P','Pinterest','#f59e0b'],['✕','X / Twitter','#ef4444']].map(([ico,name,dot])=>`
+    <div class="s-item" onclick="appNav('dashboard',document.getElementById('si-dashboard'))">
+      <span style="font-size:13px;width:15px;text-align:center">${ico}</span> ${name}
+      <div class="s-dot" style="background:${dot}"></div>
+    </div>`).join('')}
+    <div class="s-section">Account</div>
+    <div class="s-item" id="si-settings" onclick="appNav('settings',this)">
+      <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+      Settings
+    </div>
+    <div class="s-footer">
+      <div class="s-user">
+        <div class="s-avatar">R</div>
+        <div><div class="s-user-name">Rahul Sharma</div><div class="s-user-plan">Free plan · 3 platforms</div></div>
+      </div>
+      <button class="s-upgrade" onclick="appNav('settings',document.getElementById('si-settings'))">Upgrade to Pro — ₹499/mo</button>
+    </div>
+  </div>
+
+  <!-- Main area -->
+  <div class="main-area">
+    <!-- Topbar -->
+    <div class="topbar">
+      <div>
+        <div class="topbar-title" id="app-title">Dashboard overview</div>
+        <div class="topbar-sub" id="app-sub">Last 30 days · 3 of 6 platforms connected</div>
+      </div>
+      <div class="topbar-right">
+        <div class="range-pills">
+          <div class="rp" onclick="setRp(this)">7d</div>
+          <div class="rp active" onclick="setRp(this)">30d</div>
+          <div class="rp" onclick="setRp(this)">90d</div>
+        </div>
+        <button class="topbar-btn" onclick="appNav('reports',document.getElementById('si-reports'))">
+          <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Export report
+        </button>
+      </div>
+    </div>
+
+    <!-- Pages -->
+    <div id="page-dashboard" class="page active"></div>
+    <div id="page-ai" class="page"></div>
+    <div id="page-seo" class="page"></div>
+    <div id="page-reports" class="page report-page-active" style="display:none;padding:0;flex-direction:column"></div>
+    <div id="page-mediakit" class="page"></div>
+    <div id="page-settings" class="page"></div>
+  </div>
+</div>
+
 <script>
-const pData = {
-  instagram:{name:'Instagram',icon:'📷',color:'#E1306C',bg:'#fce4ec',followers:142800,reach:890400,impressions:2100000,eng:4.2,fgrow:'+2.4%'},
-  youtube:{name:'YouTube',icon:'▶',color:'#FF0000',bg:'#ffebee',followers:68400,reach:1240000,impressions:3800000,eng:7.1,fgrow:'+1.1%'},
-  tiktok:{name:'TikTok',icon:'♪',color:'#8e44ad',bg:'#f3e5f5',followers:91600,reach:2100000,impressions:5400000,eng:9.2,fgrow:'+8.4%'},
-  linkedin:{name:'LinkedIn',icon:'in',color:'#0077B5',bg:'#e3f2fd',followers:24100,reach:310000,impressions:720000,eng:5.4,fgrow:'+3.2%'},
-  pinterest:{name:'Pinterest',icon:'P',color:'#E60023',bg:'#fce4ec',followers:18200,reach:140000,impressions:380000,eng:3.1,fgrow:'+1.8%'},
-};
-const labels=['Jun 1','Jun 6','Jun 11','Jun 16','Jun 21','Jun 26','Jun 30'];
-const reachSeries={
-  instagram:[28000,31000,35000,42000,38000,45000,52000],
-  youtube:[38000,44000,48000,42000,51000,55000,60000],
-  tiktok:[55000,62000,80000,95000,88000,110000,130000],
-  linkedin:[8000,10000,11000,12000,10500,13000,14000],
-  pinterest:[4000,5000,6000,5500,7000,8000,9000],
-};
-let charts=[];
-function clearCharts(){charts.forEach(c=>{try{c.destroy()}catch(e){}});charts=[];}
+const CHARTS = [];
+function clearCharts(){ CHARTS.forEach(c=>{try{c.destroy()}catch(e){}});CHARTS.length=0; }
 
-function nav(view, el){
-  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
-  el && el.classList && el.classList.add('active');
-  const titles={overview:'All platforms overview',ai:'AI-powered insights',seo:'Website SEO analytics',mediakit:'Sponsor media kit',pricing:'Plans & pricing'};
-  const subs={overview:'Last 30 days · 5 platforms connected',ai:'Personalised recommendations based on your data',seo:'Google Search Console · Last 30 days',mediakit:'Share with brands to get sponsorships',pricing:'India-first pricing — pay in ₹'};
-  document.getElementById('page-title').textContent=titles[view]||'Dashboard';
-  document.getElementById('page-sub').textContent=subs[view]||'';
-  clearCharts();
-  if(view==='overview') renderOverview();
-  else if(view==='ai') renderAI();
-  else if(view==='seo') renderSEO();
-  else if(view==='mediakit') renderMediaKit();
-  else if(view==='pricing') renderPricing();
+// ── Screen routing
+function goTo(s){
+  document.querySelectorAll('.screen').forEach(el=>el.classList.remove('active'));
+  const el = document.getElementById('screen-'+s);
+  el.classList.add('active');
+  if(s==='app') renderPage('dashboard');
 }
 
-function setRange(btn){document.querySelectorAll('.dr-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');}
+// ── Auth tabs
+function authTab(t){
+  document.querySelectorAll('.auth-tab').forEach((el,i)=>el.classList.toggle('active',i===(t==='login'?0:1)));
+  document.getElementById('form-login').classList.toggle('hidden', t!=='login');
+  document.getElementById('form-signup').classList.toggle('hidden', t!=='signup');
+}
 
-function renderOverview(){
-  const pids=Object.keys(pData);
-  const totalReach=pids.reduce((s,p)=>s+pData[p].reach,0);
-  const totalImp=pids.reduce((s,p)=>s+pData[p].impressions,0);
-  const totalFol=pids.reduce((s,p)=>s+pData[p].followers,0);
-  const avgEng=(pids.reduce((s,p)=>s+pData[p].eng,0)/pids.length).toFixed(1);
-  const el=document.getElementById('page-content');
+// ── Onboarding
+let currentStep=0, connectedCount=3;
+const steps=['step-0','step-1','step-2','step-3'];
+const dots=['sd0','sd1','sd2','sd3'];
+function nextStep(){
+  if(currentStep<steps.length-1){
+    document.getElementById(steps[currentStep]).classList.remove('active');
+    dots.forEach((d,i)=>{
+      document.getElementById(d).classList.remove('active','done');
+      if(i<currentStep+1) document.getElementById(d).classList.add('done');
+      if(i===currentStep+1) document.getElementById(d).classList.add('active');
+    });
+    currentStep++;
+    document.getElementById(steps[currentStep]).classList.add('active');
+  }
+}
+function prevStep(){
+  if(currentStep>0){
+    document.getElementById(steps[currentStep]).classList.remove('active');
+    dots.forEach((d,i)=>{
+      document.getElementById(d).classList.remove('active','done');
+      if(i<currentStep-1) document.getElementById(d).classList.add('done');
+      if(i===currentStep-1) document.getElementById(d).classList.add('active');
+    });
+    currentStep--;
+    document.getElementById(steps[currentStep]).classList.add('active');
+  }
+}
+function togglePlat(i){
+  const item=document.getElementById('pi-'+i);
+  const btn=document.getElementById('pb-'+i);
+  const on=item.classList.toggle('connected');
+  btn.textContent=on?'Connected':'Connect';
+  btn.classList.toggle('done',on);
+  connectedCount=on?connectedCount+1:connectedCount-1;
+  document.getElementById('conn-count').textContent=connectedCount;
+}
+function verifyWebsite(){
+  document.getElementById('website-status').style.display='flex';
+}
+
+// ── App nav
+function appNav(page, el){
+  document.querySelectorAll('.s-item').forEach(i=>i.classList.remove('active'));
+  el && el.classList && el.classList.add('active');
+  const titles={dashboard:'Dashboard overview',ai:'AI-powered insights',seo:'SEO + social analytics',reports:'Report builder',mediakit:'Sponsor media kit',settings:'Account settings'};
+  const subs={dashboard:'Last 30 days · 3 of 6 platforms connected',ai:'Personalised from your last 90 days of data',seo:'Google Search Console · social reach combined',reports:'Build, customise, and export advanced reports',mediakit:'Share with brands for sponsorship deals',settings:'Manage connections, plan, and preferences'};
+  document.getElementById('app-title').textContent=titles[page];
+  document.getElementById('app-sub').textContent=subs[page];
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.page').forEach(p=>{p.style.display='none';});
+  const pg=document.getElementById('page-'+page);
+  if(page==='reports'){pg.style.display='flex';}
+  else{pg.style.display='block'; pg.classList.add('active');}
+  clearCharts();
+  renderPage(page);
+}
+function setRp(el){document.querySelectorAll('.rp').forEach(r=>r.classList.remove('active'));el.classList.add('active');}
+
+// ── Data
+const labels=['Jun 1','Jun 6','Jun 11','Jun 16','Jun 21','Jun 26','Jun 30'];
+const pConf=[
+  {id:'ig',name:'Instagram',ico:'📷',color:'#e1306c',bg:'#3b1f2b',followers:142800,reach:890400,imp:2100000,eng:4.2,grow:'+2.4%'},
+  {id:'yt',name:'YouTube',ico:'▶',color:'#ff4444',bg:'#2d1515',followers:68400,reach:1240000,imp:3800000,eng:7.1,grow:'+1.1%'},
+  {id:'tk',name:'TikTok',ico:'♪',color:'#a855f7',bg:'#1f1430',followers:91600,reach:2100000,imp:5400000,eng:9.2,grow:'+8.4%'},
+  {id:'li',name:'LinkedIn',ico:'in',color:'#0ea5e9',bg:'#102030',followers:24100,reach:310000,imp:720000,eng:5.4,grow:'+3.2%'},
+  {id:'pi',name:'Pinterest',ico:'P',color:'#f43f5e',bg:'#2d1010',followers:18200,reach:140000,imp:380000,eng:3.1,grow:'+1.8%'},
+];
+const reachS={ig:[28,31,35,42,38,45,52],yt:[38,44,48,42,51,55,60],tk:[55,62,80,95,88,110,130],li:[8,10,11,12,10,13,14],pi:[4,5,6,5,7,8,9]};
+
+function renderPage(p){
+  if(p==='dashboard') renderDashboard();
+  else if(p==='ai') renderAI();
+  else if(p==='seo') renderSEO();
+  else if(p==='reports') renderReports();
+  else if(p==='mediakit') renderMediaKit();
+  else if(p==='settings') renderSettings();
+}
+
+function renderDashboard(){
+  const el=document.getElementById('page-dashboard');
+  const totalReach=pConf.reduce((s,p)=>s+p.reach,0);
+  const totalImp=pConf.reduce((s,p)=>s+p.imp,0);
+  const totalFol=pConf.reduce((s,p)=>s+p.followers,0);
+  const avgEng=(pConf.reduce((s,p)=>s+p.eng,0)/pConf.length).toFixed(1);
   el.innerHTML=`
-  <div class="kpi-row">
-    <div class="kpi"><div class="kpi-label">Total reach</div><div class="kpi-val">${(totalReach/1e6).toFixed(2)}M</div><div class="kpi-delta up">↑ 14.3% vs last period</div></div>
-    <div class="kpi"><div class="kpi-label">Total impressions</div><div class="kpi-val">${(totalImp/1e6).toFixed(1)}M</div><div class="kpi-delta up">↑ 11.8% vs last period</div></div>
-    <div class="kpi"><div class="kpi-label">Total followers</div><div class="kpi-val">${(totalFol/1000).toFixed(1)}K</div><div class="kpi-delta up">↑ 3.1% this month</div></div>
-    <div class="kpi"><div class="kpi-label">Avg engagement</div><div class="kpi-val">${avgEng}%</div><div class="kpi-delta up">↑ 0.4pp vs last period</div></div>
+  <div class="kpi-grid">
+    <div class="kpi-card"><div class="kpi-label">Total reach</div><div class="kpi-val">${(totalReach/1e6).toFixed(2)}M</div><div class="kpi-delta delta-up">↑ 14.3% vs prev period</div></div>
+    <div class="kpi-card"><div class="kpi-label">Total impressions</div><div class="kpi-val">${(totalImp/1e6).toFixed(1)}M</div><div class="kpi-delta delta-up">↑ 11.8% vs prev period</div></div>
+    <div class="kpi-card"><div class="kpi-label">Total followers</div><div class="kpi-val">${(totalFol/1000).toFixed(1)}K</div><div class="kpi-delta delta-up">↑ 3.1% this month</div></div>
+    <div class="kpi-card"><div class="kpi-label">Avg engagement</div><div class="kpi-val">${avgEng}%</div><div class="kpi-delta delta-up">↑ 0.4pp vs prev</div></div>
   </div>
-  <div class="ai-card">
-    <div class="ai-header">
-      <div class="ai-icon"><svg viewBox="0 0 16 16"><path d="M8 1a5 5 0 0 1 5 5c0 2.1-1.3 3.9-3.2 4.7V12H6.2v-.3C4.3 9.9 3 8.1 3 6a5 5 0 0 1 5-5z"/><path d="M6 15h4m-3-3v3m2-3v3"/></svg></div>
-      <div><div class="ai-title">AI insights — 3 recommendations for you</div><div class="ai-sub">Based on your last 30 days of data</div></div>
+  <div style="background:var(--bg2);border:1px solid rgba(79,142,247,0.2);border-radius:var(--radius-lg);padding:14px;margin-bottom:12px">
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
+      <div style="width:24px;height:24px;border-radius:7px;background:var(--accent-soft);display:flex;align-items:center;justify-content:center"><svg width="13" height="13" fill="none" stroke="var(--accent)" stroke-width="2" viewBox="0 0 24 24"><path d="M12 2a7 7 0 0 1 7 7c0 3-1.8 5.5-4.5 6.6V17h-5v-1.4C6.8 14.5 5 12 5 9a7 7 0 0 1 7-7z"/></svg></div>
+      <span style="font-size:13px;font-weight:600;color:var(--text)">3 AI recommendations for you</span>
+      <span style="font-size:11px;color:var(--text3);margin-left:auto">Based on last 30 days</span>
     </div>
-    <div class="insight-row">
-      <div class="insight"><span class="insight-badge" style="background:#E6F1FB;color:#0C447C">Reach</span><div class="insight-text">Your TikTok videos posted on Tuesday get <strong style="color:var(--color-text-primary)">2.8x more reach</strong> than other days. Try posting your next reel on Tuesday.</div><div class="insight-action">Apply this tip ↗</div></div>
-      <div class="insight"><span class="insight-badge" style="background:#EAF3DE;color:#3B6D11">Growth</span><div class="insight-text">Instagram Reels drive <strong style="color:var(--color-text-primary)">3.1x more followers</strong> than static posts for you. Shift 60% of your content to Reels.</div><div class="insight-action">See your Reels data ↗</div></div>
-      <div class="insight"><span class="insight-badge" style="background:#FAEEDA;color:#633806">Engagement</span><div class="insight-text">Your LinkedIn articles outperform posts by <strong style="color:var(--color-text-primary)">4.2x engagement</strong>. You haven't posted an article in 18 days — write one this week.</div><div class="insight-action">View LinkedIn tips ↗</div></div>
+    <div class="insight-grid">
+      <div class="insight-card"><span class="i-tag" style="background:var(--accent-soft);color:var(--accent)">Reach</span><div class="i-text">TikTok videos on <strong>Tuesday 6–8 PM</strong> get 2.8× more reach than other days.</div><div class="i-action">Apply tip ↗</div></div>
+      <div class="insight-card"><span class="i-tag" style="background:var(--green-soft);color:var(--green)">Growth</span><div class="i-text">Reels drive <strong>3.1× more followers</strong> than static posts. Shift 60% of posts to Reels.</div><div class="i-action">View Reels data ↗</div></div>
+      <div class="insight-card"><span class="i-tag" style="background:var(--amber-soft);color:var(--amber)">Engagement</span><div class="i-text">LinkedIn articles outperform posts <strong>4.2× engagement</strong>. Last article was 18 days ago.</div><div class="i-action">LinkedIn tips ↗</div></div>
     </div>
   </div>
-  <div class="row2">
+  <div class="two-col">
     <div class="card">
       <div class="card-hd"><div><div class="card-title">Reach over time</div><div class="card-sub">All platforms</div></div></div>
-      <div style="position:relative;height:210px"><canvas id="reachChart"></canvas></div>
+      <div style="position:relative;height:200px"><canvas id="rc1"></canvas></div>
     </div>
     <div class="card">
       <div class="card-hd"><div class="card-title">Platform breakdown</div></div>
-      <div id="platBars" style="margin-top:8px"></div>
+      <div id="pBars" style="margin-top:6px"></div>
     </div>
   </div>
   <div class="card">
-    <div class="card-hd"><div class="card-title">Top posts</div><div style="font-size:11px;color:var(--color-text-tertiary)">All platforms · last 30 days</div></div>
-    <table class="ptable">
-      <thead><tr><th>Post</th><th>Platform</th><th>Reach</th><th>Engagement</th><th>Date</th></tr></thead>
+    <div class="card-hd"><div class="card-title">Top posts</div><span style="font-size:11px;color:var(--text3)">All platforms · last 30 days</span></div>
+    <table class="data-table">
+      <thead><tr><th>Post</th><th>Platform</th><th>Reach</th><th>Engagement</th><th>Trend</th><th>Date</th></tr></thead>
       <tbody>
-        <tr><td>Day in our life vlog</td><td><span class="pill" style="background:#f3e5f5;color:#6c3483">TikTok</span></td><td>320K</td><td>11.4%</td><td style="color:var(--color-text-tertiary)">Jun 30</td></tr>
-        <tr><td>How we built our studio</td><td><span class="pill" style="background:#ffebee;color:#c0392b">YouTube</span></td><td>128K</td><td>8.2%</td><td style="color:var(--color-text-tertiary)">Jun 27</td></tr>
-        <tr><td>Summer lookbook reel</td><td><span class="pill" style="background:#fce4ec;color:#880e4f">Instagram</span></td><td>48K</td><td>6.8%</td><td style="color:var(--color-text-tertiary)">Jun 28</td></tr>
-        <tr><td>How we scaled to 50 customers</td><td><span class="pill" style="background:#e3f2fd;color:#0d47a1">LinkedIn</span></td><td>28K</td><td>7.1%</td><td style="color:var(--color-text-tertiary)">Jun 28</td></tr>
-        <tr><td>Spring collection pins</td><td><span class="pill" style="background:#fce4ec;color:#b71c1c">Pinterest</span></td><td>22K</td><td>4.8%</td><td style="color:var(--color-text-tertiary)">Jun 26</td></tr>
+        <tr><td style="color:var(--text)">Day in our life vlog</td><td><span class="pill" style="background:var(--purple-soft);color:var(--purple)">TikTok</span></td><td>320K</td><td style="color:var(--green)">11.4%</td><td style="color:var(--green)">↑ 38%</td><td>Jun 30</td></tr>
+        <tr><td style="color:var(--text)">How we built our studio</td><td><span class="pill" style="background:var(--red-soft);color:var(--red)">YouTube</span></td><td>128K</td><td style="color:var(--green)">8.2%</td><td style="color:var(--green)">↑ 21%</td><td>Jun 27</td></tr>
+        <tr><td style="color:var(--text)">Summer lookbook reel</td><td><span class="pill" style="background:rgba(225,48,108,.12);color:#e1306c">Instagram</span></td><td>48K</td><td style="color:var(--green)">6.8%</td><td style="color:var(--green)">↑ 14%</td><td>Jun 28</td></tr>
+        <tr><td style="color:var(--text)">How we scaled to 50 customers</td><td><span class="pill" style="background:rgba(14,165,233,.12);color:#0ea5e9">LinkedIn</span></td><td>28K</td><td style="color:var(--green)">7.1%</td><td style="color:var(--amber)">→ 2%</td><td>Jun 28</td></tr>
+        <tr><td style="color:var(--text)">Spring collection pins</td><td><span class="pill" style="background:var(--red-soft);color:var(--red)">Pinterest</span></td><td>22K</td><td>4.8%</td><td style="color:var(--red)">↓ 3%</td><td>Jun 26</td></tr>
       </tbody>
     </table>
   </div>`;
-  const colors=['#E1306C','#FF0000','#8e44ad','#0077B5','#E60023'];
-  const pids2=Object.keys(pData);
   setTimeout(()=>{
-    const c=new Chart(document.getElementById('reachChart'),{type:'line',data:{labels,datasets:pids2.map((p,i)=>({label:pData[p].name,data:reachSeries[p],borderColor:colors[i],borderWidth:1.5,pointRadius:0,tension:.4,fill:false}))},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{display:false},ticks:{font:{size:10},color:'#888'}},y:{grid:{color:'rgba(0,0,0,0.04)'},ticks:{font:{size:10},color:'#888',callback:v=>v>=1000?(v/1000)+'K':v}}}}});
-    charts.push(c);
-    const max=Math.max(...pids2.map(p=>pData[p].reach));
-    document.getElementById('platBars').innerHTML=pids2.map((p,i)=>`<div class="bar-row"><div class="bar-lbl">${pData[p].name}</div><div class="bar-track"><div class="bar-fill" style="width:${Math.round(pData[p].reach/max*100)}%;background:${colors[i]}"></div></div><div class="bar-val">${(pData[p].reach/1000).toFixed(0)}K</div></div>`).join('');
+    const c=new Chart(document.getElementById('rc1'),{type:'line',data:{labels,datasets:pConf.map(p=>({label:p.name,data:reachS[p.id],borderColor:p.color,borderWidth:1.5,pointRadius:0,tension:.4,fill:false}))},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{display:false},ticks:{font:{size:10},color:'#4e5566'}},y:{grid:{color:'rgba(255,255,255,0.04)'},ticks:{font:{size:10},color:'#4e5566',callback:v=>v+'K'}}}}});
+    CHARTS.push(c);
+    const max=Math.max(...pConf.map(p=>p.reach));
+    document.getElementById('pBars').innerHTML=pConf.map(p=>`<div class="hbar"><div class="hbar-label">${p.name}</div><div class="hbar-track"><div class="hbar-fill" style="width:${Math.round(p.reach/max*100)}%;background:${p.color}"></div></div><div class="hbar-val">${(p.reach/1000).toFixed(0)}K</div></div>`).join('');
   },80);
 }
 
 function renderAI(){
-  document.getElementById('page-content').innerHTML=`
-  <div class="kpi-row">
-    <div class="kpi"><div class="kpi-label">Best day to post</div><div class="kpi-val">Tuesday</div><div class="kpi-delta up">↑ 2.8x avg reach</div></div>
-    <div class="kpi"><div class="kpi-label">Best time to post</div><div class="kpi-val">6–8 PM</div><div class="kpi-delta up">↑ 34% more engagement</div></div>
-    <div class="kpi"><div class="kpi-label">Top content type</div><div class="kpi-val">Reels</div><div class="kpi-delta up">↑ 3.1x vs static posts</div></div>
-    <div class="kpi"><div class="kpi-label">Growth forecast</div><div class="kpi-val">+12.4%</div><div class="kpi-delta up">Projected next 30 days</div></div>
+  const el=document.getElementById('page-ai');
+  el.innerHTML=`
+  <div class="kpi-grid">
+    <div class="kpi-card"><div class="kpi-label">Best day to post</div><div class="kpi-val" style="font-size:18px;margin-top:4px">Tuesday</div><div class="kpi-delta delta-up">↑ 2.8× avg reach</div></div>
+    <div class="kpi-card"><div class="kpi-label">Best time to post</div><div class="kpi-val" style="font-size:18px;margin-top:4px">6–8 PM</div><div class="kpi-delta delta-up">↑ 34% engagement</div></div>
+    <div class="kpi-card"><div class="kpi-label">Top content type</div><div class="kpi-val" style="font-size:18px;margin-top:4px">Reels</div><div class="kpi-delta delta-up">↑ 3.1× vs static</div></div>
+    <div class="kpi-card"><div class="kpi-label">30d growth forecast</div><div class="kpi-val" style="font-size:18px;margin-top:4px">+12.4%</div><div class="kpi-delta delta-up">Based on trend</div></div>
   </div>
-  <div class="card" style="margin-bottom:12px">
-    <div class="card-hd"><div><div class="card-title">Engagement heatmap — best times to post</div><div class="card-sub">Based on your last 90 days of data</div></div></div>
-    <div style="overflow-x:auto;margin-top:4px">
-      <table style="width:100%;border-collapse:collapse;font-size:11px">
-        <tr><td style="padding:4px 8px;color:var(--color-text-tertiary)"></td>${['Mon','Tue','Wed','Thu','Fri','Sat','Sun'].map(d=>`<td style="padding:6px 4px;text-align:center;color:var(--color-text-tertiary);font-weight:500">${d}</td>`).join('')}</tr>
-        ${[['6 AM',[1,2,1,1,2,3,3]],['9 AM',[3,4,3,4,3,2,2]],['12 PM',[4,5,4,5,4,3,3]],['3 PM',[3,4,4,4,4,4,3]],['6 PM',[5,6,5,6,5,4,4]],['9 PM',[4,5,4,5,4,3,4]]].map(([t,vals])=>`<tr><td style="padding:6px 8px;color:var(--color-text-tertiary);font-size:11px">${t}</td>${vals.map(v=>{const bg=v<=2?'#E6F1FB':v<=4?'#85B7EB':'#185FA5';const c=v<=2?'#0C447C':'white';return`<td style="padding:4px;text-align:center"><div style="width:32px;height:28px;border-radius:4px;background:${bg};color:${c};display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:500;margin:0 auto">${v}</div></td>`}).join('')}</tr>`).join('')}
-      </table>
-      <div style="display:flex;align-items:center;gap:8px;margin-top:8px;font-size:11px;color:var(--color-text-tertiary)"><div style="display:flex;gap:4px;align-items:center"><div style="width:10px;height:10px;border-radius:2px;background:#E6F1FB"></div>Low</div><div style="display:flex;gap:4px;align-items:center"><div style="width:10px;height:10px;border-radius:2px;background:#85B7EB"></div>Medium</div><div style="display:flex;gap:4px;align-items:center"><div style="width:10px;height:10px;border-radius:2px;background:#185FA5"></div>High</div></div>
+  <div class="two-col">
+    <div class="card">
+      <div class="card-hd"><div><div class="card-title">Engagement heatmap</div><div class="card-sub">Best times to post — score 1–6</div></div></div>
+      <div style="overflow-x:auto">
+        <table style="border-collapse:collapse;font-size:11px;width:100%">
+          <tr><td style="padding:4px 8px;color:var(--text3);width:60px"></td>${['Mon','Tue','Wed','Thu','Fri','Sat','Sun'].map(d=>`<td style="padding:5px 3px;text-align:center;color:var(--text3);font-weight:500;font-size:11px">${d}</td>`).join('')}</tr>
+          ${[['6 AM',[1,2,1,1,2,3,3]],['9 AM',[3,4,3,4,3,2,2]],['12 PM',[4,5,4,5,4,3,3]],['3 PM',[3,4,4,4,4,4,3]],['6 PM',[5,6,5,6,5,4,4]],['9 PM',[4,5,4,5,4,3,4]]].map(([t,vals])=>`<tr><td style="padding:4px 8px;color:var(--text3);font-size:11px">${t}</td>${vals.map(v=>{const a=v/6;const bg=`rgba(79,142,247,${0.1+a*0.85})`;const c=a>.5?'white':'rgba(79,142,247,0.9)';return`<td style="padding:3px"><div class="hmap-cell" style="background:${bg};color:${c}">${v}</div></td>`}).join('')}</tr>`).join('')}
+        </table>
+        <div style="display:flex;align-items:center;gap:10px;margin-top:10px;font-size:11px;color:var(--text3)">
+          <div style="display:flex;gap:4px;align-items:center"><div style="width:10px;height:10px;border-radius:2px;background:rgba(79,142,247,0.15)"></div>Low</div>
+          <div style="display:flex;gap:4px;align-items:center"><div style="width:10px;height:10px;border-radius:2px;background:rgba(79,142,247,0.55)"></div>Medium</div>
+          <div style="display:flex;gap:4px;align-items:center"><div style="width:10px;height:10px;border-radius:2px;background:rgba(79,142,247,0.95)"></div>Peak</div>
+        </div>
+      </div>
     </div>
-  </div>
-  <div class="row2">
     <div class="card">
       <div class="card-hd"><div class="card-title">Content type performance</div></div>
-      <div style="position:relative;height:200px"><canvas id="ctypeChart"></canvas></div>
+      <div style="position:relative;height:220px"><canvas id="ctc"></canvas></div>
+    </div>
+  </div>
+  <div class="two-col">
+    <div class="card">
+      <div class="card-hd"><div class="card-title">Follower growth forecast</div><div class="card-sub" style="font-size:10px;background:var(--purple-soft);color:var(--purple);padding:2px 8px;border-radius:10px">AI projected</div></div>
+      <div style="position:relative;height:200px"><canvas id="ffc"></canvas></div>
     </div>
     <div class="card">
-      <div class="card-hd"><div class="card-title">Follower growth forecast</div></div>
-      <div style="position:relative;height:200px"><canvas id="forecastChart"></canvas></div>
+      <div class="card-hd"><div class="card-title">Platform comparison</div><div class="card-sub">Engagement rate by platform</div></div>
+      <div style="position:relative;height:200px"><canvas id="pcc"></canvas></div>
     </div>
   </div>`;
   setTimeout(()=>{
-    const c1=new Chart(document.getElementById('ctypeChart'),{type:'bar',data:{labels:['Reels','Stories','Carousels','Static','Videos','Articles'],datasets:[{data:[8.4,4.1,5.2,2.8,7.1,6.8],backgroundColor:['#185FA5','#85B7EB','#378ADD','#B5D4F4','#0C447C','#042C53'],borderRadius:4}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{display:false},ticks:{font:{size:10},color:'#888'}},y:{grid:{color:'rgba(0,0,0,0.04)'},ticks:{font:{size:10},color:'#888',callback:v=>v+'%'}}}}});
-    const c2=new Chart(document.getElementById('forecastChart'),{type:'line',data:{labels:['Jun','Jul (proj)','Aug (proj)','Sep (proj)'],datasets:[{label:'Actual',data:[345100,null,null,null],borderColor:'#185FA5',borderWidth:2,pointRadius:3,tension:.4},{label:'Forecast',data:[null,385000,420000,462000],borderColor:'#85B7EB',borderWidth:1.5,borderDash:[4,4],pointRadius:3,tension:.4}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{font:{size:11},boxWidth:10,padding:10}}},scales:{x:{grid:{display:false},ticks:{font:{size:10},color:'#888'}},y:{grid:{color:'rgba(0,0,0,0.04)'},ticks:{font:{size:10},color:'#888',callback:v=>v>=1000?(v/1000).toFixed(0)+'K':v}}}}});
-    charts.push(c1,c2);
+    const c1=new Chart(document.getElementById('ctc'),{type:'bar',data:{labels:['Reels','Videos','Articles','Stories','Carousels','Static'],datasets:[{data:[8.4,7.1,6.8,4.1,5.2,2.8],backgroundColor:['#4f8ef7','#4f8ef7','#4f8ef7','rgba(79,142,247,0.4)','rgba(79,142,247,0.4)','rgba(79,142,247,0.25)'],borderRadius:5}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{display:false},ticks:{font:{size:10},color:'#4e5566'}},y:{grid:{color:'rgba(255,255,255,0.04)'},ticks:{font:{size:10},color:'#4e5566',callback:v=>v+'%'}}}}});
+    const c2=new Chart(document.getElementById('ffc'),{type:'line',data:{labels:['Jun','Jul','Aug','Sep'],datasets:[{label:'Actual',data:[345100,null,null,null],borderColor:'#4f8ef7',borderWidth:2,pointRadius:4,tension:.4},{label:'Forecast',data:[null,388000,432000,476000],borderColor:'#a855f7',borderWidth:1.5,borderDash:[5,4],pointRadius:4,tension:.4}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{color:'#8b92a5',font:{size:11},boxWidth:10}}},scales:{x:{grid:{display:false},ticks:{color:'#4e5566',font:{size:10}}},y:{grid:{color:'rgba(255,255,255,0.04)'},ticks:{color:'#4e5566',font:{size:10},callback:v=>v>=1000?(v/1000).toFixed(0)+'K':v}}}}});
+    const c3=new Chart(document.getElementById('pcc'),{type:'bar',indexAxis:'y',data:{labels:['TikTok','YouTube','LinkedIn','Instagram','Pinterest'],datasets:[{data:[9.2,7.1,5.4,4.2,3.1],backgroundColor:['#a855f7','#ef4444','#0ea5e9','#e1306c','#f43f5e'].map(c=>c+'cc'),borderRadius:4}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{color:'rgba(255,255,255,0.04)'},ticks:{color:'#4e5566',font:{size:10},callback:v=>v+'%'}},y:{grid:{display:false},ticks:{color:'#8b92a5',font:{size:11}}}}}});
+    CHARTS.push(c1,c2,c3);
   },80);
 }
 
 function renderSEO(){
-  document.getElementById('page-content').innerHTML=`
-  <div class="seo-row">
-    <div class="seo-stat"><div class="seo-stat-label">Organic sessions</div><div class="seo-stat-val">41,200</div><div class="kpi-delta up" style="font-size:11px;margin-top:3px">↑ 18.2%</div></div>
-    <div class="seo-stat"><div class="seo-stat-label">Ranked keywords</div><div class="seo-stat-val">284</div><div class="kpi-delta up" style="font-size:11px;margin-top:3px">↑ 24 new</div></div>
-    <div class="seo-stat"><div class="seo-stat-label">Backlinks</div><div class="seo-stat-val">1,840</div><div class="kpi-delta up" style="font-size:11px;margin-top:3px">↑ 112 this month</div></div>
-    <div class="seo-stat"><div class="seo-stat-label">Domain rating</div><div class="seo-stat-val">52</div><div class="kpi-delta up" style="font-size:11px;margin-top:3px">↑ 3 pts</div></div>
+  const el=document.getElementById('page-seo');
+  el.innerHTML=`
+  <div class="seo-combined-note">
+    <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v4m0 4h.01"/></svg>
+    Pulse is the only tool that shows your website SEO + social reach on one screen. Competitors don't do this.
   </div>
-  <div class="row2" style="margin-bottom:12px">
+  <div class="kpi-grid">
+    <div class="kpi-card"><div class="kpi-label">Organic sessions</div><div class="kpi-val">41.2K</div><div class="kpi-delta delta-up">↑ 18.2% vs prev</div></div>
+    <div class="kpi-card"><div class="kpi-label">Ranked keywords</div><div class="kpi-val">284</div><div class="kpi-delta delta-up">↑ 24 new this month</div></div>
+    <div class="kpi-card"><div class="kpi-label">Backlinks</div><div class="kpi-val">1,840</div><div class="kpi-delta delta-up">↑ 112 new</div></div>
+    <div class="kpi-card"><div class="kpi-label">Domain rating</div><div class="kpi-val">52</div><div class="kpi-delta delta-up">↑ 3 pts</div></div>
+  </div>
+  <div class="two-col">
     <div class="card">
-      <div class="card-hd"><div class="card-title">Organic traffic vs social reach</div><div class="card-sub">Social + SEO combined view</div></div>
-      <div style="position:relative;height:210px"><canvas id="seoChart"></canvas></div>
+      <div class="card-hd"><div><div class="card-title">Organic traffic vs social reach</div><div class="card-sub">Combined — unique to Pulse</div></div></div>
+      <div style="position:relative;height:210px"><canvas id="sc1"></canvas></div>
     </div>
     <div class="card">
       <div class="card-hd"><div class="card-title">Traffic sources</div></div>
-      <div style="position:relative;height:210px"><canvas id="srcChart"></canvas></div>
+      <div style="position:relative;height:210px"><canvas id="sc2"></canvas></div>
     </div>
   </div>
   <div class="card">
-    <div class="card-hd"><div class="card-title">Top pages</div></div>
-    <table class="ptable">
-      <thead><tr><th>Page</th><th>Sessions</th><th>Avg position</th><th>CTR</th><th>Bounce rate</th></tr></thead>
+    <div class="card-hd"><div class="card-title">Top landing pages</div></div>
+    <table class="data-table">
+      <thead><tr><th>Page</th><th>Sessions</th><th>Avg position</th><th>CTR</th><th>Bounce rate</th><th>Trend</th></tr></thead>
       <tbody>
-        <tr><td>/blog/design-tips</td><td>8,420</td><td>3.2</td><td>6.8%</td><td>34%</td></tr>
-        <tr><td>/features</td><td>6,100</td><td>5.1</td><td>4.2%</td><td>41%</td></tr>
-        <tr><td>/blog/analytics-guide</td><td>4,880</td><td>7.4</td><td>3.9%</td><td>38%</td></tr>
-        <tr><td>/pricing</td><td>3,920</td><td>9.8</td><td>5.1%</td><td>29%</td></tr>
-        <tr><td>/ (homepage)</td><td>3,400</td><td>12.1</td><td>2.8%</td><td>52%</td></tr>
+        <tr><td style="color:var(--accent);font-family:var(--mono);font-size:11px">/blog/design-tips</td><td>8,420</td><td>3.2</td><td style="color:var(--green)">6.8%</td><td style="color:var(--green)">34%</td><td style="color:var(--green)">↑ 22%</td></tr>
+        <tr><td style="color:var(--accent);font-family:var(--mono);font-size:11px">/features</td><td>6,100</td><td>5.1</td><td>4.2%</td><td>41%</td><td style="color:var(--green)">↑ 9%</td></tr>
+        <tr><td style="color:var(--accent);font-family:var(--mono);font-size:11px">/blog/analytics-guide</td><td>4,880</td><td>7.4</td><td>3.9%</td><td>38%</td><td style="color:var(--green)">↑ 14%</td></tr>
+        <tr><td style="color:var(--accent);font-family:var(--mono);font-size:11px">/pricing</td><td>3,920</td><td>9.8</td><td style="color:var(--amber)">5.1%</td><td style="color:var(--green)">29%</td><td style="color:var(--amber)">→ 1%</td></tr>
+        <tr><td style="color:var(--accent);font-family:var(--mono);font-size:11px">/ (homepage)</td><td>3,400</td><td>12.1</td><td>2.8%</td><td style="color:var(--red)">52%</td><td style="color:var(--red)">↓ 4%</td></tr>
       </tbody>
     </table>
   </div>`;
   setTimeout(()=>{
-    const c1=new Chart(document.getElementById('seoChart'),{type:'line',data:{labels,datasets:[{label:'Organic traffic',data:[820,940,1050,980,1200,1380,1640],borderColor:'#185FA5',borderWidth:2,pointRadius:0,tension:.4,fill:false},{label:'Social reach (÷10)',data:[14000,15100,17900,22800,18550,23100,26500].map(v=>Math.round(v/10)),borderColor:'#E1306C',borderWidth:1.5,borderDash:[3,3],pointRadius:0,tension:.4,fill:false}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{font:{size:11},boxWidth:10,padding:10}}},scales:{x:{grid:{display:false},ticks:{font:{size:10},color:'#888'}},y:{grid:{color:'rgba(0,0,0,0.04)'},ticks:{font:{size:10},color:'#888'}}}}});
-    const c2=new Chart(document.getElementById('srcChart'),{type:'doughnut',data:{labels:['Organic search','Direct','Social','Referral'],datasets:[{data:[58,22,12,8],backgroundColor:['#185FA5','#1D9E75','#E1306C','#8e44ad'],borderWidth:0}]},options:{responsive:true,maintainAspectRatio:false,cutout:'68%',plugins:{legend:{position:'bottom',labels:{font:{size:11},boxWidth:10,padding:10}}}}});
-    charts.push(c1,c2);
+    const c1=new Chart(document.getElementById('sc1'),{type:'line',data:{labels,datasets:[{label:'Organic traffic',data:[820,940,1050,980,1200,1380,1640],borderColor:'#4f8ef7',borderWidth:2,pointRadius:0,tension:.4,fill:false},{label:'Social reach (÷10)',data:[1400,1510,1790,2280,1855,2310,2650],borderColor:'#a855f7',borderWidth:1.5,borderDash:[4,3],pointRadius:0,tension:.4,fill:false}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{color:'#8b92a5',font:{size:11},boxWidth:10}}},scales:{x:{grid:{display:false},ticks:{color:'#4e5566',font:{size:10}}},y:{grid:{color:'rgba(255,255,255,0.04)'},ticks:{color:'#4e5566',font:{size:10}}}}}});
+    const c2=new Chart(document.getElementById('sc2'),{type:'doughnut',data:{labels:['Organic search','Direct','Social','Referral'],datasets:[{data:[58,22,12,8],backgroundColor:['#4f8ef7','#22c55e','#e1306c','#a855f7'],borderWidth:0,borderRadius:3}]},options:{responsive:true,maintainAspectRatio:false,cutout:'68%',plugins:{legend:{position:'bottom',labels:{color:'#8b92a5',font:{size:11},boxWidth:10,padding:10}}}}});
+    CHARTS.push(c1,c2);
   },80);
 }
 
-function renderMediaKit(){
-  document.getElementById('page-content').innerHTML=`
-  <div class="mediakit-wrap">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
-      <div>
-        <div style="font-size:13px;font-weight:500;color:var(--color-text-primary)">Your media kit</div>
-        <div style="font-size:12px;color:var(--color-text-tertiary)">Share this link with brands to get sponsorship deals</div>
-      </div>
-      <div style="display:flex;gap:8px">
-        <button class="copy-btn">Copy link</button>
-        <button class="share-btn">Share kit</button>
-      </div>
+function renderReports(){
+  const el=document.getElementById('page-reports');
+  el.innerHTML=`
+  <div class="report-toolbar">
+    <div class="report-type-tabs">
+      <div class="rtt active" onclick="switchReport('overview',this)">Overview report</div>
+      <div class="rtt" onclick="switchReport('comparison',this)">Comparison</div>
+      <div class="rtt" onclick="switchReport('growth',this)">Growth analysis</div>
+      <div class="rtt" onclick="switchReport('deep',this)">Deep-dive</div>
     </div>
-    <div class="mk-header">
-      <div class="mk-avatar">P</div>
-      <div>
-        <div class="mk-name">Pulse Creator</div>
-        <div class="mk-handle">@pulsecreator · Mumbai, India</div>
-        <div class="mk-bio">Content creator focused on tech, design, and entrepreneurship. Helping 345K+ followers build businesses online.</div>
-      </div>
+    <div style="margin-left:auto;display:flex;gap:8px">
+      <button class="rt-btn" onclick="alert('Report saved to your account')">
+        <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+        Save
+      </button>
+      <button class="rt-btn" onclick="alert('Shareable link copied!')">
+        <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+        Share link
+      </button>
+      <button class="rt-btn accent" onclick="alert('Downloading PDF report...')">
+        <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Export PDF
+      </button>
+      <button class="rt-btn" onclick="alert('Downloading Excel/CSV...')">
+        <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+        Export Excel
+      </button>
     </div>
-    <div class="mk-stats">
-      <div class="mk-stat"><div class="mk-stat-val">345K</div><div class="mk-stat-label">Total followers</div><div class="mk-stat-plat">Across 5 platforms</div></div>
-      <div class="mk-stat"><div class="mk-stat-val">4.68M</div><div class="mk-stat-label">Monthly reach</div><div class="mk-stat-plat">Organic only</div></div>
-      <div class="mk-stat"><div class="mk-stat-val">5.9%</div><div class="mk-stat-label">Avg engagement</div><div class="mk-stat-plat">Industry avg: 1.2%</div></div>
-      <div class="mk-stat"><div class="mk-stat-val">41.2K</div><div class="mk-stat-label">Monthly website</div><div class="mk-stat-plat">Organic sessions</div></div>
-    </div>
-    <div style="font-size:12px;font-weight:500;color:var(--color-text-secondary);margin-bottom:8px;text-transform:uppercase;letter-spacing:.05em">Platform breakdown</div>
-    <div class="mk-platforms">
-      ${[['📷','Instagram','#fce4ec','142.8K followers','4.2% engagement','890K reach/mo'],['▶','YouTube','#ffebee','68.4K subscribers','7.1% engagement','1.24M reach/mo'],['♪','TikTok','#f3e5f5','91.6K followers','9.2% engagement','2.1M reach/mo'],['in','LinkedIn','#e3f2fd','24.1K followers','5.4% engagement','310K reach/mo']].map(([ico,name,bg,f,e,r])=>`
-      <div class="mk-plat">
-        <div class="mk-plat-ico" style="background:${bg}"><span style="font-size:16px">${ico}</span></div>
-        <div><div class="mk-plat-name">${name}</div><div class="mk-plat-detail">${f}</div></div>
-        <div class="mk-plat-stats"><div class="mk-plat-stat-val">${e}</div><div class="mk-plat-stat-label">engagement</div></div>
+  </div>
+  <div style="display:flex;flex:1;overflow:hidden">
+    <div class="report-sidebar">
+      <div class="report-section-header">Report blocks</div>
+      ${[
+        ['📊','KPI summary','Key metrics overview'],
+        ['📈','Reach over time','Line chart, all platforms'],
+        ['🍩','Platform split','Donut chart breakdown'],
+        ['📋','Top posts table','Best performing content'],
+        ['🤖','AI insights','3 smart recommendations'],
+        ['🔍','SEO overview','Organic traffic + keywords'],
+        ['📉','Engagement trends','Rates over time'],
+        ['🆚','Platform comparison','Side-by-side bar chart'],
+        ['📆','Weekly heatmap','Best posting times'],
+        ['🎯','Goal tracking','Vs targets you set'],
+      ].map(([ico,name,desc])=>`
+      <div class="report-block-btn" onclick="alert('Block added to report')">
+        <span style="font-size:16px">${ico}</span>
+        <div><div>${name}</div><div class="rb-desc">${desc}</div></div>
+        <svg style="margin-left:auto;width:13px;height:13px;color:var(--text3)" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
       </div>`).join('')}
     </div>
-    <div class="mk-footer">
-      <div>
-        <div class="mk-footer-text" style="font-weight:500;color:var(--color-text-primary)">Verified by Pulse Analytics</div>
-        <div class="mk-footer-text">All stats are real-time from connected accounts · Last updated Jun 30, 2025</div>
+    <div class="report-canvas">
+      <div class="report-canvas-inner" id="report-canvas-content"></div>
+    </div>
+  </div>`;
+  renderReportCanvas('overview');
+}
+
+function switchReport(type, el){
+  document.querySelectorAll('.rtt').forEach(r=>r.classList.remove('active'));
+  el.classList.add('active');
+  clearCharts();
+  renderReportCanvas(type);
+}
+
+function renderReportCanvas(type){
+  const el=document.getElementById('report-canvas-content');
+  if(!el) return;
+  const date = 'July 1, 2025';
+  const period = 'June 1 – June 30, 2025';
+
+  if(type==='overview'){
+    el.innerHTML=`
+    <div class="rc-brand">
+      <div><div class="rc-title">Monthly Analytics Report</div><div class="rc-meta">Generated ${date} · Period: ${period}</div><div class="rc-meta">Prepared for Rahul Sharma · rahulsharma.in</div></div>
+      <div class="rc-logo">PULSE</div>
+    </div>
+    <div class="rc-section">
+      <div class="rc-section-title">Executive summary</div>
+      <div class="rc-kpi-row">
+        <div class="rc-kpi"><div class="rc-kpi-label">Total reach</div><div class="rc-kpi-val">4.68M</div><div class="rc-kpi-delta" style="color:#16a34a">↑ 14.3%</div></div>
+        <div class="rc-kpi"><div class="rc-kpi-label">Impressions</div><div class="rc-kpi-val">12.4M</div><div class="rc-kpi-delta" style="color:#16a34a">↑ 11.8%</div></div>
+        <div class="rc-kpi"><div class="rc-kpi-label">Followers</div><div class="rc-kpi-val">345.1K</div><div class="rc-kpi-delta" style="color:#16a34a">↑ 3.1%</div></div>
+        <div class="rc-kpi"><div class="rc-kpi-label">Avg engagement</div><div class="rc-kpi-val">5.9%</div><div class="rc-kpi-delta" style="color:#16a34a">↑ 0.4pp</div></div>
       </div>
-      <div style="font-size:11px;color:var(--color-text-tertiary);text-align:right">pulse.app/kit/pulsecreator<br>Valid for 30 days</div>
+    </div>
+    <div class="rc-section">
+      <div class="rc-section-title">Reach & impressions trend</div>
+      <div class="rc-chart-row">
+        <div class="rc-chart-box"><div class="rc-chart-title">Reach over time (all platforms)</div><div style="position:relative;height:150px"><canvas id="rep1"></canvas></div></div>
+        <div class="rc-chart-box"><div class="rc-chart-title">Platform reach distribution</div><div style="position:relative;height:150px"><canvas id="rep2"></canvas></div></div>
+      </div>
+    </div>
+    <div class="rc-section">
+      <div class="rc-section-title">Platform breakdown</div>
+      <div class="rc-plat-row">
+        ${pConf.map(p=>`<div class="rc-plat-card"><div class="rc-plat-name">${p.ico} ${p.name}</div><div class="rc-plat-stat">${(p.followers/1000).toFixed(1)}K</div><div class="rc-plat-label">Followers · ${p.grow} this month</div><div style="margin-top:6px;font-size:11px;color:#333;font-family:'DM Sans'">Reach: <strong>${(p.reach/1000).toFixed(0)}K</strong> · Eng: <strong style="color:${p.eng>5?'#16a34a':'#92400e'}">${p.eng}%</strong></div></div>`).join('')}
+      </div>
+    </div>
+    <div class="rc-section">
+      <div class="rc-section-title">Top performing content</div>
+      <table class="rc-table">
+        <thead><tr><th>Post title</th><th>Platform</th><th>Reach</th><th>Engagement</th><th>Date</th></tr></thead>
+        <tbody>
+          <tr><td>Day in our life vlog</td><td>TikTok</td><td>320K</td><td style="color:#16a34a;font-weight:700">11.4%</td><td>Jun 30</td></tr>
+          <tr><td>How we built our studio</td><td>YouTube</td><td>128K</td><td style="color:#16a34a;font-weight:700">8.2%</td><td>Jun 27</td></tr>
+          <tr><td>Summer lookbook reel</td><td>Instagram</td><td>48K</td><td style="color:#16a34a;font-weight:700">6.8%</td><td>Jun 28</td></tr>
+          <tr><td>How we scaled to 50 customers</td><td>LinkedIn</td><td>28K</td><td style="color:#16a34a;font-weight:700">7.1%</td><td>Jun 28</td></tr>
+          <tr><td>Spring collection pins</td><td>Pinterest</td><td>22K</td><td>4.8%</td><td>Jun 26</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="rc-section">
+      <div class="rc-section-title">AI-generated insights</div>
+      <div class="rc-insight-box"><div class="rc-insight-title">Reach optimisation</div><div class="rc-insight-text">TikTok videos published on Tuesday between 6–8 PM achieve 2.8× higher reach than the platform average. Recommend shifting 2 weekly posts to this slot.</div></div>
+      <div class="rc-insight-box"><div class="rc-insight-title">Follower growth strategy</div><div class="rc-insight-text">Reels drive 3.1× more follower conversions than static posts on Instagram. A 60% content shift to Reels could add an estimated 4,200 new followers over 30 days.</div></div>
+      <div class="rc-insight-box"><div class="rc-insight-title">SEO correlation</div><div class="rc-insight-text">Organic sessions increased 18.2% this month, correlating with the 22% spike in social reach during Jun 21–28. Social activity is driving website discovery.</div></div>
+    </div>
+    <div class="rc-footer"><div class="rc-footer-text">Generated by Pulse Analytics · pulse.app · ${date}</div><div class="rc-footer-text">Verified real-time data from connected accounts</div></div>`;
+  } else if(type==='comparison'){
+    el.innerHTML=`
+    <div class="rc-brand"><div><div class="rc-title">Platform Comparison Report</div><div class="rc-meta">Period: ${period} · Rahul Sharma</div></div><div class="rc-logo">PULSE</div></div>
+    <div class="rc-section">
+      <div class="rc-section-title">Platform vs platform — head to head</div>
+      <table class="rc-table">
+        <thead><tr><th>Platform</th><th>Followers</th><th>Reach</th><th>Impressions</th><th>Engagement</th><th>Growth</th><th>Best content</th></tr></thead>
+        <tbody>
+          ${pConf.map(p=>`<tr><td><strong>${p.ico} ${p.name}</strong></td><td>${(p.followers/1000).toFixed(1)}K</td><td>${(p.reach/1000).toFixed(0)}K</td><td>${(p.imp/1e6).toFixed(1)}M</td><td style="color:${p.eng>5?'#16a34a':'#92400e'};font-weight:700">${p.eng}%</td><td style="color:#16a34a">${p.grow}</td><td>Reels</td></tr>`).join('')}
+        </tbody>
+      </table>
+    </div>
+    <div class="rc-section">
+      <div class="rc-section-title">Reach comparison chart</div>
+      <div class="rc-chart-box"><div class="rc-chart-title">Monthly reach by platform (K)</div><div style="position:relative;height:200px"><canvas id="cmp1"></canvas></div></div>
+    </div>
+    <div class="rc-section">
+      <div class="rc-section-title">Engagement rate comparison</div>
+      <div class="rc-chart-box"><div class="rc-chart-title">Engagement rate % — industry avg: 1.2%</div><div style="position:relative;height:160px"><canvas id="cmp2"></canvas></div></div>
+    </div>
+    <div class="rc-section">
+      <div class="rc-section-title">Strategic recommendation</div>
+      <div class="rc-insight-box"><div class="rc-insight-title">Prioritise TikTok + YouTube</div><div class="rc-insight-text">TikTok delivers the highest reach (2.1M) and best engagement (9.2%). YouTube delivers the best CPV for long-form. Together they represent 72% of your total reach. Recommend allocating 65% of content effort to these two platforms.</div></div>
+    </div>
+    <div class="rc-footer"><div class="rc-footer-text">Pulse Analytics · ${date}</div><div class="rc-footer-text">Data sourced from official platform APIs</div></div>`;
+  } else if(type==='growth'){
+    el.innerHTML=`
+    <div class="rc-brand"><div><div class="rc-title">Growth Analysis Report</div><div class="rc-meta">Period: ${period} · Trend analysis & forecast</div></div><div class="rc-logo">PULSE</div></div>
+    <div class="rc-section">
+      <div class="rc-section-title">Month-over-month growth</div>
+      <div class="rc-kpi-row">
+        <div class="rc-kpi"><div class="rc-kpi-label">New followers</div><div class="rc-kpi-val">+10.3K</div><div class="rc-kpi-delta" style="color:#16a34a">Best month ever</div></div>
+        <div class="rc-kpi"><div class="rc-kpi-label">Reach growth</div><div class="rc-kpi-val">+14.3%</div><div class="rc-kpi-delta" style="color:#16a34a">↑ from 9.1% last mo</div></div>
+        <div class="rc-kpi"><div class="rc-kpi-label">SEO growth</div><div class="rc-kpi-val">+18.2%</div><div class="rc-kpi-delta" style="color:#16a34a">24 new keywords</div></div>
+        <div class="rc-kpi"><div class="rc-kpi-label">Eng rate growth</div><div class="rc-kpi-val">+0.4pp</div><div class="rc-kpi-delta" style="color:#16a34a">From 5.5% → 5.9%</div></div>
+      </div>
+    </div>
+    <div class="rc-section">
+      <div class="rc-section-title">90-day follower trajectory</div>
+      <div class="rc-chart-box"><div style="position:relative;height:200px"><canvas id="grw1"></canvas></div></div>
+    </div>
+    <div class="rc-section">
+      <div class="rc-section-title">AI 90-day forecast</div>
+      <table class="rc-table">
+        <thead><tr><th>Metric</th><th>Current</th><th>Jul forecast</th><th>Aug forecast</th><th>Sep forecast</th><th>Confidence</th></tr></thead>
+        <tbody>
+          <tr><td>Total followers</td><td>345.1K</td><td>388K</td><td>432K</td><td>476K</td><td style="color:#16a34a">High (87%)</td></tr>
+          <tr><td>Monthly reach</td><td>4.68M</td><td>5.1M</td><td>5.6M</td><td>6.1M</td><td style="color:#16a34a">High (82%)</td></tr>
+          <tr><td>Organic sessions</td><td>41.2K</td><td>46K</td><td>51K</td><td>58K</td><td style="color:#92400e">Medium (71%)</td></tr>
+          <tr><td>Avg engagement</td><td>5.9%</td><td>6.1%</td><td>6.3%</td><td>6.4%</td><td style="color:#92400e">Medium (68%)</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="rc-footer"><div class="rc-footer-text">Pulse Analytics · ${date}</div><div class="rc-footer-text">Forecasts use 90-day rolling trend model</div></div>`;
+  } else {
+    el.innerHTML=`
+    <div class="rc-brand"><div><div class="rc-title">Deep-Dive Analytics Report</div><div class="rc-meta">Full breakdown · ${period}</div></div><div class="rc-logo">PULSE</div></div>
+    <div class="rc-section">
+      <div class="rc-section-title">Posting frequency analysis</div>
+      <table class="rc-table">
+        <thead><tr><th>Platform</th><th>Posts this month</th><th>Avg reach/post</th><th>Best day</th><th>Best time</th><th>Recommended freq</th></tr></thead>
+        <tbody>
+          <tr><td>Instagram</td><td>18</td><td>49.5K</td><td>Tuesday</td><td>6 PM</td><td>Daily Reels</td></tr>
+          <tr><td>YouTube</td><td>8</td><td>155K</td><td>Wednesday</td><td>3 PM</td><td>2× per week</td></tr>
+          <tr><td>TikTok</td><td>22</td><td>95.5K</td><td>Tuesday</td><td>7 PM</td><td>Daily</td></tr>
+          <tr><td>LinkedIn</td><td>12</td><td>25.8K</td><td>Wednesday</td><td>9 AM</td><td>4× per week</td></tr>
+          <tr><td>Pinterest</td><td>35</td><td>4K</td><td>Saturday</td><td>2 PM</td><td>5× per day</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="rc-section">
+      <div class="rc-section-title">Audience demographics (combined)</div>
+      <div class="rc-chart-row">
+        <div class="rc-chart-box"><div class="rc-chart-title">Age distribution</div><div style="position:relative;height:140px"><canvas id="dp1"></canvas></div></div>
+        <div class="rc-chart-box"><div class="rc-chart-title">Top locations</div><div style="position:relative;height:140px"><canvas id="dp2"></canvas></div></div>
+      </div>
+    </div>
+    <div class="rc-section">
+      <div class="rc-section-title">Content format ROI</div>
+      <table class="rc-table">
+        <thead><tr><th>Format</th><th>Avg reach</th><th>Avg eng rate</th><th>Follower conv</th><th>Production effort</th><th>ROI score</th></tr></thead>
+        <tbody>
+          <tr><td>Short video (Reels/TikTok)</td><td>95K</td><td style="color:#16a34a">9.1%</td><td>0.8%</td><td>Medium</td><td style="color:#16a34a;font-weight:700">9.2 / 10</td></tr>
+          <tr><td>Long-form video (YouTube)</td><td>155K</td><td style="color:#16a34a">7.1%</td><td>0.4%</td><td>High</td><td style="color:#16a34a;font-weight:700">8.4 / 10</td></tr>
+          <tr><td>LinkedIn article</td><td>28K</td><td style="color:#16a34a">7.1%</td><td>1.1%</td><td>Medium</td><td style="color:#16a34a;font-weight:700">8.1 / 10</td></tr>
+          <tr><td>Instagram carousel</td><td>38K</td><td>5.2%</td><td>0.6%</td><td>Low</td><td>6.8 / 10</td></tr>
+          <tr><td>Static image post</td><td>22K</td><td style="color:#92400e">2.8%</td><td>0.2%</td><td>Low</td><td style="color:#92400e">3.9 / 10</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="rc-footer"><div class="rc-footer-text">Pulse Analytics · ${date}</div><div class="rc-footer-text">Deep-dive reports available on Pro plan</div></div>`;
+  }
+  setTimeout(()=>{
+    const repCharts={
+      rep1:{type:'line',data:{labels,datasets:pConf.map(p=>({label:p.name,data:reachS[p.id],borderColor:p.color,borderWidth:1.5,pointRadius:0,tension:.4,fill:false}))},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{font:{size:9}}},y:{ticks:{font:{size:9},callback:v=>v+'K'}}}}},
+      rep2:{type:'doughnut',data:{labels:pConf.map(p=>p.name),datasets:[{data:pConf.map(p=>p.reach),backgroundColor:pConf.map(p=>p.color),borderWidth:0}]},options:{responsive:true,maintainAspectRatio:false,cutout:'60%',plugins:{legend:{position:'right',labels:{font:{size:9},boxWidth:8,padding:6}}}}},
+      cmp1:{type:'bar',data:{labels:pConf.map(p=>p.name),datasets:[{data:pConf.map(p=>Math.round(p.reach/1000)),backgroundColor:pConf.map(p=>p.color),borderRadius:4}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{font:{size:9}}},y:{ticks:{font:{size:9}}}}}},
+      cmp2:{type:'bar',indexAxis:'y',data:{labels:['TikTok','YouTube','LinkedIn','Instagram','Pinterest'],datasets:[{data:[9.2,7.1,5.4,4.2,3.1],backgroundColor:pConf.map(p=>p.color+'bb'),borderRadius:3}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{font:{size:9},callback:v=>v+'%'}},y:{ticks:{font:{size:9}}}}}},
+      grw1:{type:'line',data:{labels:['Apr','May','Jun','Jul(f)','Aug(f)','Sep(f)'],datasets:[{label:'Actual',data:[298000,321000,345100,null,null,null],borderColor:'#2563eb',borderWidth:2,pointRadius:3,tension:.4},{label:'Forecast',data:[null,null,345100,388000,432000,476000],borderColor:'#7c3aed',borderWidth:1.5,borderDash:[5,3],pointRadius:3,tension:.4}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{font:{size:9},boxWidth:8}}},scales:{x:{ticks:{font:{size:9}}},y:{ticks:{font:{size:9},callback:v=>v>=1000?(v/1000).toFixed(0)+'K':v}}}}},
+      dp1:{type:'bar',data:{labels:['13-17','18-24','25-34','35-44','45-54','55+'],datasets:[{data:[8,34,38,12,5,3],backgroundColor:'#2563eb',borderRadius:3}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{font:{size:9}}},y:{ticks:{font:{size:9},callback:v=>v+'%'}}}}},
+      dp2:{type:'bar',indexAxis:'y',data:{labels:['Mumbai','Delhi','Bangalore','Pune','Hyderabad'],datasets:[{data:[28,22,18,14,10],backgroundColor:'#2563eb',borderRadius:3}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{font:{size:9},callback:v=>v+'%'}},y:{ticks:{font:{size:9}}}}}},
+    };
+    Object.entries(repCharts).forEach(([id,cfg])=>{
+      const canvas=document.getElementById(id);
+      if(canvas){const c=new Chart(canvas,cfg);CHARTS.push(c);}
+    });
+  },100);
+}
+
+function renderMediaKit(){
+  const el=document.getElementById('page-mediakit');
+  el.innerHTML=`
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+    <div><div style="font-size:13px;font-weight:600;color:var(--text)">Your sponsor media kit</div><div style="font-size:12px;color:var(--text3);margin-top:2px">Share with brands to get paid partnerships</div></div>
+    <div style="display:flex;gap:8px">
+      <button class="topbar-btn" onclick="alert('Editing profile...')">Edit profile</button>
+      <button class="topbar-btn accent" onclick="alert('Link copied: pulse.app/kit/rahulsharma')">Share kit link</button>
+    </div>
+  </div>
+  <div class="mk-preview">
+    <div class="mk-header-band">
+      <div class="mk-avatar">R</div>
+      <div>
+        <div class="mk-name">Rahul Sharma</div>
+        <div class="mk-handle">@rahulsharma · Mumbai, India · Tech & Entrepreneurship creator</div>
+        <div class="mk-bio">Helping 345K+ followers build businesses online. 5 years content experience. Featured in YourStory, Inc42, Economic Times.</div>
+        <div class="mk-verify">
+          <svg width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+          Verified by Pulse Analytics · Real-time data
+        </div>
+      </div>
+    </div>
+    <div class="mk-body">
+      <div class="mk-stat-grid">
+        <div class="mk-stat-card"><div class="mk-stat-val">345K</div><div class="mk-stat-label">Total followers</div></div>
+        <div class="mk-stat-card"><div class="mk-stat-val">4.68M</div><div class="mk-stat-label">Monthly reach</div></div>
+        <div class="mk-stat-card"><div class="mk-stat-val">5.9%</div><div class="mk-stat-label">Avg engagement</div></div>
+        <div class="mk-stat-card"><div class="mk-stat-val">41.2K</div><div class="mk-stat-label">Website/month</div></div>
+      </div>
+      <div style="font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">Platform breakdown</div>
+      <div class="mk-plat-grid">
+        ${[['📷','Instagram','#3b1f2b','142.8K followers','890K reach/mo','4.2%'],['▶','YouTube','#2d1515','68.4K subscribers','1.24M reach/mo','7.1%'],['♪','TikTok','#1f1430','91.6K followers','2.1M reach/mo','9.2%'],['in','LinkedIn','#102030','24.1K connections','310K reach/mo','5.4%']].map(([ico,name,bg,fol,reach,eng])=>`
+        <div class="mk-plat-row">
+          <div class="mk-plat-ico" style="background:${bg}">${ico}</div>
+          <div class="mk-plat-info">
+            <div class="mk-plat-pname">${name}</div>
+            <div class="mk-plat-detail">${fol} · ${reach}</div>
+          </div>
+          <div style="text-align:right">
+            <div class="mk-plat-eng">${eng}</div>
+            <div class="mk-plat-eng-label">engagement</div>
+          </div>
+        </div>`).join('')}
+      </div>
+      <div style="background:var(--bg4);border-radius:var(--radius);padding:12px;margin-bottom:8px">
+        <div style="font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">Audience demographics</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;font-size:12px;color:var(--text2)">
+          <div><div style="font-size:10px;color:var(--text3);margin-bottom:4px">Top age group</div><div style="color:var(--text);font-weight:600">18–34 years (72%)</div></div>
+          <div><div style="font-size:10px;color:var(--text3);margin-bottom:4px">Top city</div><div style="color:var(--text);font-weight:600">Mumbai (28%)</div></div>
+          <div><div style="font-size:10px;color:var(--text3);margin-bottom:4px">Gender split</div><div style="color:var(--text);font-weight:600">62% Male · 38% Female</div></div>
+        </div>
+      </div>
+    </div>
+    <div class="mk-footer-band">
+      <div class="share-link-box">
+        <svg width="13" height="13" fill="none" stroke="var(--text3)" stroke-width="2" viewBox="0 0 24 24"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+        <span class="share-link-text">pulse.app/kit/rahulsharma</span>
+        <button class="btn-copy" onclick="this.textContent='Copied!';setTimeout(()=>this.textContent='Copy',2000)">Copy</button>
+      </div>
+      <div style="font-size:11px;color:var(--text3);text-align:right">Last updated: Jun 30, 2025<br>Auto-updates every 24 hours</div>
     </div>
   </div>`;
 }
 
-function renderPricing(){
-  document.getElementById('page-content').innerHTML=`
-  <div style="text-align:center;margin-bottom:24px">
-    <div style="font-size:20px;font-weight:500;color:var(--color-text-primary);margin-bottom:6px">India-first pricing</div>
-    <div style="font-size:13px;color:var(--color-text-secondary)">10–50x cheaper than Hootsuite or Sprout Social. Cancel anytime.</div>
-  </div>
-  <div class="pricing-grid">
-    <div class="price-card">
-      <div class="price-name">Free</div>
-      <div style="margin:10px 0"><div class="price-amount">₹0</div><div class="price-period">forever free</div></div>
-      <hr class="price-divider">
-      ${[['3 social platforms','✓'],['Basic analytics','✓'],['7-day data history','✓'],['AI insights','✗'],['SEO analytics','✗'],['Media kit','✗']].map(([f,v])=>`<div class="price-feature"><svg fill="none" stroke="${v==='✓'?'#1D9E75':'#ccc'}" stroke-width="2" viewBox="0 0 24 24"><path d="${v==='✓'?'M20 6 9 17l-5-5':'M18 6 6 18M6 6l12 12'}"/></svg><span style="color:${v==='✓'?'var(--color-text-secondary)':'var(--color-text-tertiary)'}">${f}</span></div>`).join('')}
-      <button class="price-btn">Current plan</button>
+function renderSettings(){
+  const el=document.getElementById('page-settings');
+  el.innerHTML=`
+  <div style="max-width:680px">
+    <div class="settings-section">
+      <div class="settings-title">Connected accounts</div>
+      ${[['📷','Instagram','@rahulsharma_','Connected · syncs every hour',true],['▶','YouTube','Rahul Sharma Channel','Connected · syncs every 6 hours',true],['♪','TikTok','@rahulsharma','Connected · syncs every hour',true],['◉','Website SEO','rahulsharma.in','Google Search Console · Connected',true],['in','LinkedIn','Rahul Sharma','Pending approval',false],['P','Pinterest','rahulsharma','Not connected',false],['✕','X / Twitter','Not connected','Requires Basic API ($200/mo)',false]].map(([ico,name,handle,status,conn])=>`
+      <div class="conn-row">
+        <div class="conn-plat">
+          <div class="conn-ico" style="background:var(--bg3)">${ico}</div>
+          <div><div class="conn-name">${name}</div><div class="conn-status" style="color:${conn?'var(--green)':'var(--text3)'}">${handle} · ${status}</div></div>
+        </div>
+        <div class="conn-actions">
+          ${conn?`<button class="btn-reconnect">Refresh</button><button class="btn-disconnect">Disconnect</button>`:`<button class="btn-reconnect" onclick="alert('Connecting ${name}...')">Connect</button>`}
+        </div>
+      </div>`).join('')}
     </div>
-    <div class="price-card popular">
-      <div class="popular-badge">Most popular</div>
-      <div class="price-name">Pro</div>
-      <div style="margin:10px 0"><div class="price-amount">₹499</div><div class="price-period">/month · billed monthly</div><div class="price-usd">≈ $6/mo · Hootsuite charges $149</div></div>
-      <hr class="price-divider">
-      ${[['All 7 platforms','✓'],['Full analytics + history','✓'],['90-day data history','✓'],['AI insights & tips','✓'],['SEO + Search Console','✓'],['Sponsor media kit','✓']].map(([f,v])=>`<div class="price-feature"><svg fill="none" stroke="#1D9E75" stroke-width="2" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg><span>${f}</span></div>`).join('')}
-      <button class="price-btn primary">Upgrade to Pro</button>
+    <div class="settings-section">
+      <div class="settings-title">Notifications</div>
+      ${[['Weekly digest email','Get a summary every Monday morning',true],['Milestone alerts','Notify when you hit follower milestones',true],['AI insight alerts','Get notified when a new insight is ready',true],['Report scheduled','Receive reports automatically on a schedule',false]].map(([label,sub,on])=>`
+      <div class="settings-row">
+        <div><div class="settings-row-label">${label}</div><div class="settings-row-sub">${sub}</div></div>
+        <div class="toggle ${on?'on':''}" onclick="this.classList.toggle('on')"></div>
+      </div>`).join('')}
     </div>
-    <div class="price-card">
-      <div class="price-name">Agency</div>
-      <div style="margin:10px 0"><div class="price-amount">₹1,499</div><div class="price-period">/month · up to 10 clients</div><div class="price-usd">≈ $18/mo · Sprout charges $199/user</div></div>
-      <hr class="price-divider">
-      ${[['10 client workspaces','✓'],['White-label reports','✓'],['1-year data history','✓'],['Priority AI insights','✓'],['SEO for all clients','✓'],['Branded media kits','✓']].map(([f,v])=>`<div class="price-feature"><svg fill="none" stroke="#1D9E75" stroke-width="2" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg><span>${f}</span></div>`).join('')}
-      <button class="price-btn">Contact us</button>
+    <div class="settings-section">
+      <div class="settings-title">Plan & billing</div>
+      <div style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-lg);padding:20px">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+          <div><div style="font-size:14px;font-weight:600;color:var(--text)">Free plan</div><div style="font-size:12px;color:var(--text3);margin-top:2px">3 platforms · 7-day history · basic analytics</div></div>
+          <span style="background:var(--amber-soft);color:var(--amber);font-size:11px;font-weight:600;padding:4px 10px;border-radius:10px">Free</span>
+        </div>
+        <div style="background:var(--bg3);border-radius:var(--radius);padding:14px;margin-bottom:12px">
+          <div style="font-size:12px;font-weight:600;color:var(--text);margin-bottom:8px">Upgrade to Pro — ₹499/month</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;font-size:12px;color:var(--text2)">
+            ${['All 7 platforms','90-day data history','AI insights & tips','SEO analytics','Sponsor media kit','Advanced reports + export','Priority support','Cancel anytime'].map(f=>`<div style="display:flex;align-items:center;gap:6px"><svg width="12" height="12" fill="none" stroke="var(--green)" stroke-width="2" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>${f}</div>`).join('')}
+          </div>
+        </div>
+        <button class="s-upgrade" style="font-size:13px;padding:11px;border-radius:var(--radius)">Upgrade to Pro — ₹499/month · Pay with UPI or card</button>
+        <div style="font-size:11px;color:var(--text3);text-align:center;margin-top:8px">No annual lock-in · Cancel anytime · GST invoice provided</div>
+      </div>
     </div>
-  </div>
-  <div style="background:var(--color-background-secondary);border-radius:var(--border-radius-lg);padding:16px;text-align:center">
-    <div style="font-size:13px;font-weight:500;color:var(--color-text-primary);margin-bottom:4px">Pay with Razorpay, UPI, or any Indian card</div>
-    <div style="font-size:12px;color:var(--color-text-secondary)">No foreign currency charges. No annual lock-in. Cancel anytime. GST invoice provided.</div>
   </div>`;
 }
 
-renderOverview();
+// Init
+renderPage('dashboard');
 </script>
+</body>
+</html>
